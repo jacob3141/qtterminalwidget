@@ -23,7 +23,6 @@ HEADERS += BlockArray.h \
            kptyprocess.h \
            LineFont.h \
            Pty.h \
-           qtermwidget.h \
            Screen.h \
            ScreenWindow.h \
            SearchBar.h \
@@ -32,7 +31,8 @@ HEADERS += BlockArray.h \
            TerminalCharacterDecoder.h \
            TerminalDisplay.h \
            tools.h \
-           Vt102Emulation.h
+           Vt102Emulation.h \
+    terminalwidget.h
 FORMS += SearchBar.ui
 SOURCES += BlockArray.cpp \
            ColorScheme.cpp \
@@ -47,7 +47,6 @@ SOURCES += BlockArray.cpp \
            kptydevice.cpp \
            kptyprocess.cpp \
            Pty.cpp \
-           qtermwidget.cpp \
            Screen.cpp \
            ScreenWindow.cpp \
            SearchBar.cpp \
@@ -56,7 +55,8 @@ SOURCES += BlockArray.cpp \
            TerminalCharacterDecoder.cpp \
            TerminalDisplay.cpp \
            tools.cpp \
-           Vt102Emulation.cpp
+           Vt102Emulation.cpp \
+    terminalwidget.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc

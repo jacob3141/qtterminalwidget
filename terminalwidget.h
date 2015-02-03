@@ -28,7 +28,7 @@ struct TermWidgetImpl;
 class SearchBar;
 class QUrl;
 
-class QTermWidget : public QWidget {
+class TerminalWidget : public QWidget {
     Q_OBJECT
 public:
 
@@ -41,13 +41,12 @@ public:
         ScrollBarRight=2
     };
 
-    //Creation of widget
-    QTermWidget(int startnow, // 1 = start shell programm immediatelly
+    TerminalWidget(int startnow, // 1 = start shell programm immediatelly
                 QWidget * parent = 0);
-    // A dummy constructor for Qt Designer. startnow is 1 by default
-    QTermWidget(QWidget *parent = 0);
 
-    virtual ~QTermWidget();
+    TerminalWidget(QWidget *parent = 0);
+
+    virtual ~TerminalWidget();
 
     //Initial size
     QSize sizeHint() const;
