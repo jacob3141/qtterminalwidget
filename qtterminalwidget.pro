@@ -1,3 +1,5 @@
+QT += widgets
+
 TEMPLATE = lib
 TARGET = qtterminalwidget
 
@@ -30,8 +32,7 @@ HEADERS += BlockArray.h \
            TerminalCharacterDecoder.h \
            TerminalDisplay.h \
            tools.h \
-           Vt102Emulation.h \
-           designer/qtermwidgetplugin.h
+           Vt102Emulation.h
 FORMS += SearchBar.ui
 SOURCES += BlockArray.cpp \
            ColorScheme.cpp \
@@ -55,8 +56,7 @@ SOURCES += BlockArray.cpp \
            TerminalCharacterDecoder.cpp \
            TerminalDisplay.cpp \
            tools.cpp \
-           Vt102Emulation.cpp \
-           designer/qtermwidgetplugin.cpp
+           Vt102Emulation.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc

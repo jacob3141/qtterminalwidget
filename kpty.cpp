@@ -69,6 +69,9 @@
 #include <unistd.h>
 #include <grp.h>
 
+#define HAVE_PTY_H
+#define HAVE_POSIX_OPENPT
+
 #if defined(HAVE_PTY_H)
 # include <pty.h>
 #endif
