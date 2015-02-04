@@ -90,7 +90,6 @@ TerminalSession::TerminalSession(QObject* parent) :
              SLOT(onReceiveBlock(const char *,int)) );
     connect( _terminalEmulation,SIGNAL(sendData(const char *,int)),_shellProcess,
              SLOT(sendData(const char *,int)) );
-    connect( _terminalEmulation,SIGNAL(lockPtyRequest(bool)),_shellProcess,SLOT(lockPty(bool)) );
     connect( _terminalEmulation,SIGNAL(useUtf8Request(bool)),_shellProcess,SLOT(setUtf8Mode(bool)) );
 
     connect( _shellProcess,SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(done(int)) );

@@ -309,11 +309,6 @@ protected:
     /**
      * @internal
      */
-    Process(ProcessPrivate *d, QObject *parent);
-
-    /**
-     * @internal
-     */
     ProcessPrivate * const d_ptr;
 
 private:

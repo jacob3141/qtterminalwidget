@@ -115,16 +115,7 @@ void ProcessPrivate::_k_forwardStderr()
 
 Process::Process(QObject *parent) :
     QProcess(parent),
-    d_ptr(new ProcessPrivate)
-{
-    d_ptr->q_ptr = this;
-    setOutputChannelMode(ForwardedChannels);
-}
-
-Process::Process(ProcessPrivate *d, QObject *parent) :
-    QProcess(parent),
-    d_ptr(d)
-{
+    d_ptr(new ProcessPrivate) {
     d_ptr->q_ptr = this;
     setOutputChannelMode(ForwardedChannels);
 }

@@ -67,23 +67,19 @@ struct PseudoTerminalProcessPrivate;
  */
 class PseudoTerminalProcess : public Process {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(PseudoTerminalProcess)
 
 public:
     enum PseudoTerminalChannelFlag {
-        NoChannels = 0, /**< The PTY is not connected to any channel. */
-        StdinChannel = 1, /**< Connect PTY to stdin. */
-        StdoutChannel = 2, /**< Connect PTY to stdout. */
-        StderrChannel = 4, /**< Connect PTY to stderr. */
-        AllOutputChannels = 6, /**< Connect PTY to all output channels. */
-        AllChannels = 7 /**< Connect PTY to all channels. */
+        NoChannels          = 0, /**< The PTY is not connected to any channel. */
+        StdinChannel        = 1, /**< Connect PTY to stdin. */
+        StdoutChannel       = 2, /**< Connect PTY to stdout. */
+        StderrChannel       = 4, /**< Connect PTY to stderr. */
+        AllOutputChannels   = 6, /**< Connect PTY to all output channels. */
+        AllChannels         = 7  /**< Connect PTY to all channels. */
     };
 
     Q_DECLARE_FLAGS(PseudoTerminalChannels, PseudoTerminalChannelFlag)
 
-    /**
-     * Constructor
-     */
     explicit PseudoTerminalProcess(QObject *parent = 0);
 
     /**
@@ -95,9 +91,6 @@ public:
      */
     PseudoTerminalProcess(int ptyMasterFd, QObject *parent = 0);
 
-    /**
-     * Destructor
-     */
     virtual ~PseudoTerminalProcess();
 
     /**
@@ -213,16 +206,6 @@ public slots:
      */
     void setUtf8Mode(bool on);
 
-    /**
-     * Suspend or resume processing of data from the standard
-     * output of the terminal process.
-     *
-     * See K3Process::suspend() and K3Process::resume()
-     *
-     * @param lock If true, processing of output is suspended,
-     * otherwise processing is resumed.
-     */
-    void lockPty(bool lock);
 
     /**
      * Sends data to the process currently controlling the
@@ -248,6 +231,7 @@ protected:
 
 private slots:
     void dataReceived();
+    void stateChanged(QProcess::ProcessState newState);
 
 private:
     PseudoTerminalDevice *pseudoTerminalDevice() const;
@@ -262,21 +246,10 @@ private:
     bool _xonXoff;
     bool _utf8;
 
-    Q_PRIVATE_SLOT(d_func(), void _k_onStateChanged(QProcess::ProcessState))
-};
+    PseudoTerminalDevice *_pseudoTerminalDevice;
+    PseudoTerminalProcess::PseudoTerminalChannels _pseudoTerminalChannels;
+    bool _addUtmp;
 
-struct PseudoTerminalProcessPrivate : ProcessPrivate {
-    PseudoTerminalProcessPrivate() :
-        pseudoTerminalChannels(PseudoTerminalProcess::NoChannels),
-        addUtmp(false)
-    {
-    }
-
-    void _k_onStateChanged(QProcess::ProcessState newState);
-
-    PseudoTerminalDevice *pty;
-    PseudoTerminalProcess::PseudoTerminalChannels pseudoTerminalChannels;
-    bool addUtmp : 1;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(PseudoTerminalProcess::PseudoTerminalChannels)

@@ -54,57 +54,46 @@
 #include <QtDebug>
 
 PseudoTerminalProcess::PseudoTerminalProcess(QObject *parent) :
-    Process(new PseudoTerminalProcessPrivate, parent)
-{
-    Q_D(PseudoTerminalProcess);
-
-    d->pty = new PseudoTerminalDevice(this);
-    d->pty->open();
+    Process(parent) {
+    _pseudoTerminalDevice = new PseudoTerminalDevice(this);
+    _pseudoTerminalDevice->open();
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
-            SLOT(_k_onStateChanged(QProcess::ProcessState)));
+            SLOT(stateChanged(QProcess::ProcessState)));
     initialize();
 }
 
 PseudoTerminalProcess::PseudoTerminalProcess(int ptyMasterFd, QObject *parent) :
-    Process(new PseudoTerminalProcessPrivate, parent)
-{
-    Q_D(PseudoTerminalProcess);
-
-    d->pty = new PseudoTerminalDevice(this);
-    d->pty->open(ptyMasterFd);
+    Process(parent) {
+    _pseudoTerminalDevice = new PseudoTerminalDevice(this);
+    _pseudoTerminalDevice->open(ptyMasterFd);
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
-            SLOT(_k_onStateChanged(QProcess::ProcessState)));
+            SLOT(stateChanged(QProcess::ProcessState)));
     initialize();
 }
 
-PseudoTerminalProcess::~PseudoTerminalProcess()
-{
-    Q_D(PseudoTerminalProcess);
-
-    if (state() != QProcess::NotRunning && d->addUtmp) {
-        d->pty->logout();
+PseudoTerminalProcess::~PseudoTerminalProcess() {
+    if(state() != QProcess::NotRunning && _addUtmp) {
+        _pseudoTerminalDevice->logout();
         disconnect(SIGNAL(stateChanged(QProcess::ProcessState)),
-                   this, SLOT(_k_onStateChanged(QProcess::ProcessState)));
+                   this, SLOT(stateChanged(QProcess::ProcessState)));
     }
-    delete d->pty;
+    delete _pseudoTerminalDevice;
 }
 
-void PseudoTerminalProcess::setWindowSize(int lines, int cols)
-{
+void PseudoTerminalProcess::setWindowSize(int lines, int cols) {
     _windowColumns = cols;
     _windowLines = lines;
 
-    if (pseudoTerminalDevice()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0) {
         pseudoTerminalDevice()->setWinSize(lines, cols);
+    }
 }
 
-QSize PseudoTerminalProcess::windowSize() const
-{
+QSize PseudoTerminalProcess::windowSize() const {
     return QSize(_windowColumns,_windowLines);
 }
 
-void PseudoTerminalProcess::setFlowControlEnabled(bool enable)
-{
+void PseudoTerminalProcess::setFlowControlEnabled(bool enable) {
     _xonXoff = enable;
 
     if (pseudoTerminalDevice()->masterFd() >= 0)
@@ -120,8 +109,7 @@ void PseudoTerminalProcess::setFlowControlEnabled(bool enable)
     }
 }
 
-bool PseudoTerminalProcess::flowControlEnabled() const
-{
+bool PseudoTerminalProcess::flowControlEnabled() const {
     if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttmode;
@@ -133,8 +121,7 @@ bool PseudoTerminalProcess::flowControlEnabled() const
     return false;
 }
 
-void PseudoTerminalProcess::setUtf8Mode(bool enable)
-{
+void PseudoTerminalProcess::setUtf8Mode(bool enable) {
 #ifdef IUTF8 // XXX not a reasonable place to check it.
     _utf8 = enable;
 
@@ -152,8 +139,7 @@ void PseudoTerminalProcess::setUtf8Mode(bool enable)
 #endif
 }
 
-void PseudoTerminalProcess::setErase(char erase)
-{
+void PseudoTerminalProcess::setErase(char erase) {
     _eraseChar = erase;
 
     if (pseudoTerminalDevice()->masterFd() >= 0)
@@ -166,8 +152,7 @@ void PseudoTerminalProcess::setErase(char erase)
     }
 }
 
-char PseudoTerminalProcess::erase() const
-{
+char PseudoTerminalProcess::erase() const {
     if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttyAttributes;
@@ -198,18 +183,12 @@ void PseudoTerminalProcess::appendEnvironmentVariables(QStringList environment)
     }
 }
 
-void PseudoTerminalProcess::setPseudoTerminalChannels(PseudoTerminalChannels channels)
-{
-    Q_D(PseudoTerminalProcess);
-
-    d->pseudoTerminalChannels = channels;
+void PseudoTerminalProcess::setPseudoTerminalChannels(PseudoTerminalChannels channels) {
+    _pseudoTerminalChannels = channels;
 }
 
-PseudoTerminalProcess::PseudoTerminalChannels PseudoTerminalProcess::pseudoTerminalChannels() const
-{
-    Q_D(const PseudoTerminalProcess);
-
-    return d->pseudoTerminalChannels;
+PseudoTerminalProcess::PseudoTerminalChannels PseudoTerminalProcess::pseudoTerminalChannels() const {
+    return _pseudoTerminalChannels;
 }
 
 int PseudoTerminalProcess::start(QString program,
@@ -247,20 +226,24 @@ int PseudoTerminalProcess::start(QString program,
 
     struct ::termios ttmode;
     pseudoTerminalDevice()->tcGetAttr(&ttmode);
-    if (!_xonXoff)
+
+    if (!_xonXoff) {
         ttmode.c_iflag &= ~(IXOFF | IXON);
-    else
+    } else {
         ttmode.c_iflag |= (IXOFF | IXON);
+    }
+
 #ifdef IUTF8 // XXX not a reasonable place to check it.
-    if (!_utf8)
+    if (!_utf8) {
         ttmode.c_iflag &= ~IUTF8;
-    else
+    } else {
         ttmode.c_iflag |= IUTF8;
+    }
 #endif
 
-    if (_eraseChar != 0)
+    if (_eraseChar != 0) {
         ttmode.c_cc[VERASE] = _eraseChar;
-
+    }
     if (!pseudoTerminalDevice()->tcSetAttr(&ttmode))
         qWarning() << "Unable to set terminal attributes.";
 
@@ -274,8 +257,7 @@ int PseudoTerminalProcess::start(QString program,
     return 0;
 }
 
-void PseudoTerminalProcess::setWriteable(bool writeable)
-{
+void PseudoTerminalProcess::setWriteable(bool writeable) {
     struct stat sbuf;
     stat(pseudoTerminalDevice()->ttyName(), &sbuf);
     if (writeable)
@@ -284,13 +266,13 @@ void PseudoTerminalProcess::setWriteable(bool writeable)
         chmod(pseudoTerminalDevice()->ttyName(), sbuf.st_mode & ~(S_IWGRP|S_IWOTH));
 }
 
-void PseudoTerminalProcess::initialize()
-{
+void PseudoTerminalProcess::initialize() {
     _windowColumns = 0;
     _windowLines = 0;
     _eraseChar = 0;
     _xonXoff = true;
-    _utf8 =true;
+    _utf8 = true;
+    _addUtmp = false;
 
     connect(pseudoTerminalDevice(), SIGNAL(readyRead()) , this , SLOT(dataReceived()));
     setPseudoTerminalChannels(PseudoTerminalProcess::AllChannels);
@@ -308,74 +290,43 @@ void PseudoTerminalProcess::sendData(const char* data, int length)
     }
 }
 
-void PseudoTerminalProcess::dataReceived()
-{
+void PseudoTerminalProcess::dataReceived() {
     QByteArray data = pseudoTerminalDevice()->readAll();
     emit receivedData(data.constData(),data.count());
 }
 
-void PseudoTerminalProcess::lockPty(bool lock)
-{
-    Q_UNUSED(lock);
-
-    // TODO: Support for locking the Pty
-    //if (lock)
-    //suspend();
-    //else
-    //resume();
-}
-
-int PseudoTerminalProcess::foregroundProcessGroup() const
-{
+int PseudoTerminalProcess::foregroundProcessGroup() const {
     int pid = tcgetpgrp(pseudoTerminalDevice()->masterFd());
 
-    if ( pid != -1 )
-    {
+    if ( pid != -1 ) {
         return pid;
     }
-
     return 0;
 }
 
-void PseudoTerminalProcess::setUseUtmp(bool value)
-{
-    Q_D(PseudoTerminalProcess);
-
-    d->addUtmp = value;
+void PseudoTerminalProcess::setUseUtmp(bool value) {
+    _addUtmp = value;
 }
 
-bool PseudoTerminalProcess::isUseUtmp() const
-{
-    Q_D(const PseudoTerminalProcess);
-
-    return d->addUtmp;
+bool PseudoTerminalProcess::isUseUtmp() const {
+    return _addUtmp;
 }
 
-PseudoTerminalDevice *PseudoTerminalProcess::pseudoTerminalDevice() const
-{
-    Q_D(const PseudoTerminalProcess);
-
-    return d->pty;
+PseudoTerminalDevice *PseudoTerminalProcess::pseudoTerminalDevice() const {
+    return _pseudoTerminalDevice;
 }
 
-void PseudoTerminalProcess::setupChildProcess()
-{
-    Q_D(PseudoTerminalProcess);
+void PseudoTerminalProcess::setupChildProcess() {
+    _pseudoTerminalDevice->setCTty();
 
-    d->pty->setCTty();
+    if (_pseudoTerminalChannels & StdinChannel)
+        dup2(_pseudoTerminalDevice->slaveFd(), 0);
 
-#if 0
-    if (d->addUtmp)
-        d->pty->login(KUser(KUser::UseRealUserID).loginName().toLocal8Bit().data(), qgetenv("DISPLAY"));
-#endif
-    if (d->pseudoTerminalChannels & StdinChannel)
-        dup2(d->pty->slaveFd(), 0);
+    if (_pseudoTerminalChannels & StdoutChannel)
+        dup2(_pseudoTerminalDevice->slaveFd(), 1);
 
-    if (d->pseudoTerminalChannels & StdoutChannel)
-        dup2(d->pty->slaveFd(), 1);
-
-    if (d->pseudoTerminalChannels & StderrChannel)
-        dup2(d->pty->slaveFd(), 2);
+    if (_pseudoTerminalChannels & StderrChannel)
+        dup2(_pseudoTerminalDevice->slaveFd(), 2);
 
     Process::setupChildProcess();
 
@@ -395,7 +346,7 @@ void PseudoTerminalProcess::setupChildProcess()
     sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 }
 
-void PseudoTerminalProcessPrivate::_k_onStateChanged(QProcess::ProcessState newState) {
-    if (newState == QProcess::NotRunning && addUtmp)
-        pty->logout();
+void PseudoTerminalProcess::stateChanged(QProcess::ProcessState newState) {
+    if (newState == QProcess::NotRunning && _addUtmp)
+        _pseudoTerminalDevice->logout();
 }
