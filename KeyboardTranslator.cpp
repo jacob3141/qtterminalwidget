@@ -42,7 +42,7 @@
 //#include <KLocale>
 //#include <KStandardDirs>
 
-using namespace Konsole;
+
 
 
 const QByteArray KeyboardTranslatorManager::defaultTranslatorText(

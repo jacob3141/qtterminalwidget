@@ -37,9 +37,6 @@
 // map
 #include <sys/mman.h>
 
-namespace Konsole
-{
-
 #if 1
 /*
    An extendable tmpfile(1) based buffer.
@@ -487,7 +484,5 @@ protected:
 
 
 #endif
-
-}
 
 #endif // TEHISTORY_H

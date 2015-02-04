@@ -30,9 +30,6 @@
 
 // Local
 
-namespace Konsole
-{
-
 typedef unsigned char LineProperty;
 class Character;
 
@@ -388,9 +385,5 @@ private:
     QString* _buffer;
     QList<int>* _linePositions;
 };
-
-}
-
-typedef Konsole::Filter Filter;
 
 #endif //FILTER_H

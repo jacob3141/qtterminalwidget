@@ -47,9 +47,6 @@
 #define MODE_Allow132Columns (MODES_SCREEN+9)   // Allow DECCOLM mode
 #define MODE_total           (MODES_SCREEN+10)
 
-namespace Konsole
-{
-
 struct CharCodes
 {
   // coding info
@@ -185,7 +182,5 @@ private:
   QHash<int,QString> _pendingTitleUpdates;
   QTimer* _titleUpdateTimer;
 };
-
-}
 
 #endif // VT102EMULATION_H

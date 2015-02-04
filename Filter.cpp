@@ -42,7 +42,7 @@
 #include "TerminalCharacterDecoder.h"
 #include "konsole_wcwidth.h"
 
-using namespace Konsole;
+
 
 FilterChain::~FilterChain()
 {

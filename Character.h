@@ -29,9 +29,6 @@
 // Local
 #include "CharacterColor.h"
 
-namespace Konsole
-{
-
 typedef unsigned char LineProperty;
 
 static const int LINE_DEFAULT        = 0;
@@ -217,8 +214,7 @@ private:
     QHash<ushort,ushort*> extendedCharTable;
 };
 
-}
-Q_DECLARE_TYPEINFO(Konsole::Character, Q_MOVABLE_TYPE);
+Q_DECLARE_TYPEINFO(Character, Q_MOVABLE_TYPE);
 
 #endif // CHARACTER_H
 

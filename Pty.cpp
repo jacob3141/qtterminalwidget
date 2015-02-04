@@ -44,7 +44,7 @@
 #include "kpty.h"
 #include "kptydevice.h"
 
-using namespace Konsole;
+
 
 void Pty::setWindowSize(int lines, int cols)
 {

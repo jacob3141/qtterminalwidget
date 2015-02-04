@@ -56,7 +56,7 @@
 #include "Screen.h"
 
 
-using namespace Konsole;
+
 
 Vt102Emulation::Vt102Emulation() 
     : Emulation(),

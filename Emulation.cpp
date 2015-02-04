@@ -48,7 +48,7 @@
 #include "TerminalCharacterDecoder.h"
 #include "ScreenWindow.h"
 
-using namespace Konsole;
+
 
 Emulation::Emulation() :
   _currentScreen(0),

@@ -29,9 +29,6 @@
 //#include <kdemacros.h>
 #define KDE_NO_EXPORT
 
-namespace Konsole
-{
-
 /** 
  * An entry in a terminal display's color palette. 
  *
@@ -292,8 +289,6 @@ inline void CharacterColor::toggleIntensive()
   }
 }
 
-
-}
 
 #endif // CHARACTERCOLOR_H
 

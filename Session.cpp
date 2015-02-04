@@ -45,7 +45,7 @@
 #include "ShellCommand.h"
 #include "Vt102Emulation.h"
 
-using namespace Konsole;
+
 
 int Session::lastSessionId = 0;
 

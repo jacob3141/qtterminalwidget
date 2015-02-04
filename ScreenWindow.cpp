@@ -26,7 +26,7 @@
 // Konsole
 #include "Screen.h"
 
-using namespace Konsole;
+
 
 ScreenWindow::ScreenWindow(QObject* parent)
     : QObject(parent)

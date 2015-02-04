@@ -35,7 +35,7 @@
 
 #define STEP_ZOOM 1
 
-using namespace Konsole;
+
 
 void *createTermWidget(int startnow, void *parent)
 {
@@ -551,7 +551,7 @@ void TerminalWidget::setEnvironment(const QStringList& environment)
 
 void TerminalWidget::setMotionAfterPasting(int action)
 {
-    m_impl->m_terminalDisplay->setMotionAfterPasting((Konsole::MotionAfterPasting) action);
+    m_impl->m_terminalDisplay->setMotionAfterPasting((MotionAfterPasting) action);
 }
 
 int TerminalWidget::historyLinesCount()

@@ -31,7 +31,7 @@
 #include <QSettings>
 #include <QDir>
 
-using namespace Konsole;
+
 
 const ColorEntry ColorScheme::defaultTable[TABLE_COLORS] =
  // The following are almost IBM standard color codes, with some slight

@@ -28,9 +28,6 @@
 // Konsole
 #include "Character.h"
 
-namespace Konsole
-{
-
 class Screen;
 
 /**
@@ -255,5 +252,4 @@ private:
                        // the last call to resetScrollCount()
 };
 
-}
 #endif // SCREENWINDOW_H

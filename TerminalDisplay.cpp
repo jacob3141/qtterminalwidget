@@ -64,7 +64,7 @@
 #include "ScreenWindow.h"
 #include "TerminalCharacterDecoder.h"
 
-using namespace Konsole;
+
 
 #ifndef loc
 #define loc(X,Y) ((Y)*_columns+(X))
@@ -76,7 +76,7 @@ using namespace Konsole;
                   "abcdefgjijklmnopqrstuvwxyz" \
                   "0123456789./+@"
 
-const ColorEntry Konsole::base_color_table[TABLE_COLORS] =
+const ColorEntry base_color_table[TABLE_COLORS] =
 // The following are almost IBM standard color codes, with some slight
 // gamma correction for the dim colors to compensate for bright X screens.
 // It contains the 8 ansiterm/xterm colors in 2 intensities.
@@ -204,7 +204,7 @@ static inline bool isLineCharString(const QString& string)
 
 // assert for i in [0..31] : vt100extended(vt100_graphics[i]) == i.
 
-unsigned short Konsole::vt100_graphics[32] =
+unsigned short vt100_graphics[32] =
 { // 0/8     1/9    2/10    3/11    4/12    5/13    6/14    7/15
   0x0020, 0x25C6, 0x2592, 0x2409, 0x240c, 0x240d, 0x240a, 0x00b0,
   0x00b1, 0x2424, 0x240b, 0x2518, 0x2510, 0x250c, 0x2514, 0x253c,

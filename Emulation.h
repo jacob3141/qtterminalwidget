@@ -37,9 +37,6 @@
 //#include "konsole_export.h"
 #define KONSOLEPRIVATE_EXPORT
 
-namespace Konsole
-{
-
 class KeyboardTranslator;
 class HistoryType;
 class Screen;
@@ -465,7 +462,5 @@ private:
   QTimer _bulkTimer2;
   
 };
-
-}
 
 #endif // ifndef EMULATION_H

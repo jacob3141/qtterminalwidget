@@ -3,7 +3,7 @@
 
 #include "CharacterColor.h"
 
-//using namespace Konsole;
+//
 #if 0
 static const ColorEntry whiteonblack_color_table[TABLE_COLORS] = {
     // normal
