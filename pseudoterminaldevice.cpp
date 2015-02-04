@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified
@@ -29,7 +36,7 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include "kptydevice.h"
+#include "pseudoterminaldevice.h"
 
 #include <QSocketNotifier>
 #include <QDebug>
@@ -80,9 +87,9 @@ static void qt_ignore_sigpipe()
 
 #define NO_INTR(ret,func) do { ret = func; } while (ret < 0 && errno == EINTR)
 
-bool KPtyDevicePrivate::_k_canRead()
+bool PseudoTerminalDevicePrivate::_k_canRead()
 {
-    Q_Q(KPtyDevice);
+    Q_Q(PseudoTerminalDevice);
     qint64 readBytes = 0;
 
 #ifdef Q_OS_IRIX // this should use a config define, but how to check it?
@@ -150,9 +157,9 @@ bool KPtyDevicePrivate::_k_canRead()
     }
 }
 
-bool KPtyDevicePrivate::_k_canWrite()
+bool PseudoTerminalDevicePrivate::_k_canWrite()
 {
-    Q_Q(KPtyDevice);
+    Q_Q(PseudoTerminalDevice);
 
     writeNotifier->setEnabled(false);
     if (writeBuffer.isEmpty())
@@ -202,9 +209,9 @@ bool KPtyDevicePrivate::_k_canWrite()
     } while (0)
 #endif
 
-bool KPtyDevicePrivate::doWait(int msecs, bool reading)
+bool PseudoTerminalDevicePrivate::doWait(int msecs, bool reading)
 {
-    Q_Q(KPtyDevice);
+    Q_Q(PseudoTerminalDevice);
 #ifndef __linux__
     struct timeval etv;
 #endif
@@ -268,9 +275,9 @@ bool KPtyDevicePrivate::doWait(int msecs, bool reading)
     return false;
 }
 
-void KPtyDevicePrivate::finishOpen(QIODevice::OpenMode mode)
+void PseudoTerminalDevicePrivate::finishOpen(QIODevice::OpenMode mode)
 {
-    Q_Q(KPtyDevice);
+    Q_Q(PseudoTerminalDevice);
 
     q->QIODevice::open(mode);
     fcntl(q->masterFd(), F_SETFL, O_NONBLOCK);
@@ -286,19 +293,19 @@ void KPtyDevicePrivate::finishOpen(QIODevice::OpenMode mode)
 // public member functions //
 /////////////////////////////
 
-KPtyDevice::KPtyDevice(QObject *parent) :
+PseudoTerminalDevice::PseudoTerminalDevice(QObject *parent) :
     QIODevice(parent),
-    d_ptr(new KPtyDevicePrivate(this)) {
+    d_ptr(new PseudoTerminalDevicePrivate(this)) {
 }
 
-KPtyDevice::~KPtyDevice() {
+PseudoTerminalDevice::~PseudoTerminalDevice() {
     close();
     delete d_ptr;
 }
 
-bool KPtyDevice::open2()
+bool PseudoTerminalDevice::open2()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (d->masterFd >= 0)
         return true;
@@ -464,13 +471,13 @@ grantedpt:
     return true;
 }
 
-bool KPtyDevice::open2(int fd)
+bool PseudoTerminalDevice::open2(int fd)
 {
 #if !defined(HAVE_PTSNAME) && !defined(TIOCGPTN)
     qWarning() << "Unsupported attempt to open pty with fd" << fd;
     return false;
 #else
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (d->masterFd >= 0) {
         qWarning() << "Attempting to open an already open pty";
@@ -506,9 +513,9 @@ bool KPtyDevice::open2(int fd)
 #endif
 }
 
-void KPtyDevice::closeSlave()
+void PseudoTerminalDevice::closeSlave()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (d->slaveFd < 0) {
         return;
@@ -517,9 +524,9 @@ void KPtyDevice::closeSlave()
     d->slaveFd = -1;
 }
 
-bool KPtyDevice::openSlave()
+bool PseudoTerminalDevice::openSlave()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (d->slaveFd >= 0)
         return true;
@@ -537,9 +544,9 @@ bool KPtyDevice::openSlave()
     return true;
 }
 
-void KPtyDevice::close2()
+void PseudoTerminalDevice::close2()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (d->masterFd < 0) {
         return;
@@ -561,9 +568,9 @@ void KPtyDevice::close2()
     d->masterFd = -1;
 }
 
-void KPtyDevice::setCTty()
+void PseudoTerminalDevice::setCTty()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     // Setup job control //////////////////////////////////
 
@@ -588,7 +595,7 @@ void KPtyDevice::setCTty()
 #endif
 }
 
-void KPtyDevice::login(const char * user, const char * remotehost)
+void PseudoTerminalDevice::login(const char * user, const char * remotehost)
 {
 #ifdef HAVE_UTEMPTER
     Q_D(KPty);
@@ -670,14 +677,14 @@ void KPtyDevice::login(const char * user, const char * remotehost)
 #endif
 }
 
-void KPtyDevice::logout()
+void PseudoTerminalDevice::logout()
 {
 #ifdef HAVE_UTEMPTER
     Q_D(KPty);
 
     removeLineFromUtmp(d->ttyName, d->masterFd);
 #else
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     const char *str_ptr = d->ttyName.data();
     if (!memcmp(str_ptr, "/dev/", 5)) {
@@ -742,23 +749,23 @@ void KPtyDevice::logout()
 // XXX Supposedly, tc[gs]etattr do not work with the master on Solaris.
 // Please verify.
 
-bool KPtyDevice::tcGetAttr(struct ::termios * ttmode) const
+bool PseudoTerminalDevice::tcGetAttr(struct ::termios * ttmode) const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
 
     return _tcgetattr(d->masterFd, ttmode) == 0;
 }
 
-bool KPtyDevice::tcSetAttr(struct ::termios * ttmode)
+bool PseudoTerminalDevice::tcSetAttr(struct ::termios * ttmode)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     return _tcsetattr(d->masterFd, ttmode) == 0;
 }
 
-bool KPtyDevice::setWinSize(int lines, int columns)
+bool PseudoTerminalDevice::setWinSize(int lines, int columns)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     struct winsize winSize;
     memset(&winSize, 0, sizeof(winSize));
@@ -767,7 +774,7 @@ bool KPtyDevice::setWinSize(int lines, int columns)
     return ioctl(d->masterFd, TIOCSWINSZ, (char *)&winSize) == 0;
 }
 
-bool KPtyDevice::setEcho(bool echo)
+bool PseudoTerminalDevice::setEcho(bool echo)
 {
     struct ::termios ttmode;
     if (!tcGetAttr(&ttmode)) {
@@ -781,31 +788,31 @@ bool KPtyDevice::setEcho(bool echo)
     return tcSetAttr(&ttmode);
 }
 
-const char * KPtyDevice::ttyName() const
+const char * PseudoTerminalDevice::ttyName() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
 
     return d->ttyName.data();
 }
 
-int KPtyDevice::masterFd() const
+int PseudoTerminalDevice::masterFd() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
 
     return d->masterFd;
 }
 
-int KPtyDevice::slaveFd() const
+int PseudoTerminalDevice::slaveFd() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
 
     return d->slaveFd;
 }
 
 
-bool KPtyDevice::open(OpenMode mode)
+bool PseudoTerminalDevice::open(OpenMode mode)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (masterFd() >= 0)
         return true;
@@ -820,9 +827,9 @@ bool KPtyDevice::open(OpenMode mode)
     return true;
 }
 
-bool KPtyDevice::open(int fd, OpenMode mode)
+bool PseudoTerminalDevice::open(int fd, OpenMode mode)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (!open2(fd)) {
         setErrorString("Error opening PTY");
@@ -834,9 +841,9 @@ bool KPtyDevice::open(int fd, OpenMode mode)
     return true;
 }
 
-void KPtyDevice::close()
+void PseudoTerminalDevice::close()
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
 
     if (masterFd() < 0)
         return;
@@ -848,77 +855,77 @@ void KPtyDevice::close()
     close2();
 }
 
-bool KPtyDevice::isSequential() const
+bool PseudoTerminalDevice::isSequential() const
 {
     return true;
 }
 
-bool KPtyDevice::canReadLine() const
+bool PseudoTerminalDevice::canReadLine() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
     return QIODevice::canReadLine() || d->readBuffer.canReadLine();
 }
 
-bool KPtyDevice::atEnd() const
+bool PseudoTerminalDevice::atEnd() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
     return QIODevice::atEnd() && d->readBuffer.isEmpty();
 }
 
-qint64 KPtyDevice::bytesAvailable() const
+qint64 PseudoTerminalDevice::bytesAvailable() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
     return QIODevice::bytesAvailable() + d->readBuffer.size();
 }
 
-qint64 KPtyDevice::bytesToWrite() const
+qint64 PseudoTerminalDevice::bytesToWrite() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
     return d->writeBuffer.size();
 }
 
-bool KPtyDevice::waitForReadyRead(int msecs)
+bool PseudoTerminalDevice::waitForReadyRead(int msecs)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     return d->doWait(msecs, true);
 }
 
-bool KPtyDevice::waitForBytesWritten(int msecs)
+bool PseudoTerminalDevice::waitForBytesWritten(int msecs)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     return d->doWait(msecs, false);
 }
 
-void KPtyDevice::setSuspended(bool suspended)
+void PseudoTerminalDevice::setSuspended(bool suspended)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     d->readNotifier->setEnabled(!suspended);
 }
 
-bool KPtyDevice::isSuspended() const
+bool PseudoTerminalDevice::isSuspended() const
 {
-    Q_D(const KPtyDevice);
+    Q_D(const PseudoTerminalDevice);
     return !d->readNotifier->isEnabled();
 }
 
 // protected
-qint64 KPtyDevice::readData(char *data, qint64 maxlen)
+qint64 PseudoTerminalDevice::readData(char *data, qint64 maxlen)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     return d->readBuffer.read(data, (int)qMin<qint64>(maxlen, KMAXINT));
 }
 
 // protected
-qint64 KPtyDevice::readLineData(char *data, qint64 maxlen)
+qint64 PseudoTerminalDevice::readLineData(char *data, qint64 maxlen)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     return d->readBuffer.readLine(data, (int)qMin<qint64>(maxlen, KMAXINT));
 }
 
 // protected
-qint64 KPtyDevice::writeData(const char *data, qint64 len)
+qint64 PseudoTerminalDevice::writeData(const char *data, qint64 len)
 {
-    Q_D(KPtyDevice);
+    Q_D(PseudoTerminalDevice);
     Q_ASSERT(len <= KMAXINT);
 
     d->writeBuffer.write(data, len);

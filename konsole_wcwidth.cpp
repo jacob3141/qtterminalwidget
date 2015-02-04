@@ -1,3 +1,10 @@
+/*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
 /* $XFree86: xc/programs/xterm/wcwidth.character,v 1.3 2001/07/29 22:08:16 tsi Exp $ */
 /*
  * This is an implementation of wcwidth() and wcswidth() as defined in

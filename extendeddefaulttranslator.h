@@ -1,3 +1,10 @@
+/*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
 "keyboard \"Default (XFree 4)\""
 "key Escape             : \"\\E\""
 "key Tab   -Shift       : \"\\t\"\n"

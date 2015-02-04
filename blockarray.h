@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
     This file is part of Konsole, an X terminal.
     Copyright (C) 2000 by Stephan Kulow <coolo@kde.org>
 

@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified

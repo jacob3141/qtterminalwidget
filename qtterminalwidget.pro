@@ -6,8 +6,6 @@ CONFIG += staticlib
 
 HEADERS += \
            konsole_wcwidth.h \
-           kptydevice.h \
-           kptyprocess.h \
     terminalwidget.h \
     blockarray.h \
     character.h \
@@ -31,12 +29,13 @@ HEADERS += \
     vt102emulation.h \
     screenwindow.h \
     terminalsession.h \
-    process.h
+    process.h \
+    ringbuffer.h \
+    pseudoterminaldevice.h \
+    pseudoterminalprocess.h
 FORMS += SearchBar.ui
 SOURCES += \
            konsole_wcwidth.cpp \
-           kptydevice.cpp \
-           kptyprocess.cpp \
     terminalwidget.cpp \
     blockarray.cpp \
     colorscheme.cpp \
@@ -54,7 +53,9 @@ SOURCES += \
     terminaldisplay.cpp \
     vt102emulation.cpp \
     terminalsession.cpp \
-    process.cpp
+    process.cpp \
+    pseudoterminaldevice.cpp \
+    pseudoterminalprocess.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc

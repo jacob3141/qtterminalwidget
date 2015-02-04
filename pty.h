@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified
@@ -31,7 +38,7 @@
 #pragma once
 
 // Own includes
-#include "kptyprocess.h"
+#include "pseudoterminalprocess.h"
 
 // Qt includes
 #include <QStringList>
@@ -52,7 +59,7 @@
  * To start the terminal process, call the start() method
  * with the program name and appropriate arguments.
  */
-class Pty: public KPtyProcess {
+class Pty: public PseudoTerminalProcess {
     Q_OBJECT
 public:
     /**

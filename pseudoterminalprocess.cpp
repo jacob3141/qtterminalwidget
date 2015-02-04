@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified
@@ -28,38 +35,38 @@
 */
 
 
-#include "kptyprocess.h"
+#include "pseudoterminalprocess.h"
 #include "process.h"
-#include "kptydevice.h"
+#include "pseudoterminaldevice.h"
 
 #include <stdlib.h>
 #include <unistd.h>
 
-KPtyProcess::KPtyProcess(QObject *parent) :
-    Process(new KPtyProcessPrivate, parent)
+PseudoTerminalProcess::PseudoTerminalProcess(QObject *parent) :
+    Process(new PseudoTerminalProcessPrivate, parent)
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
-    d->pty = new KPtyDevice(this);
+    d->pty = new PseudoTerminalDevice(this);
     d->pty->open();
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
 }
 
-KPtyProcess::KPtyProcess(int ptyMasterFd, QObject *parent) :
-    Process(new KPtyProcessPrivate, parent)
+PseudoTerminalProcess::PseudoTerminalProcess(int ptyMasterFd, QObject *parent) :
+    Process(new PseudoTerminalProcessPrivate, parent)
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
-    d->pty = new KPtyDevice(this);
+    d->pty = new PseudoTerminalDevice(this);
     d->pty->open(ptyMasterFd);
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
 }
 
-KPtyProcess::~KPtyProcess()
+PseudoTerminalProcess::~PseudoTerminalProcess()
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
     if (state() != QProcess::NotRunning && d->addUtmp) {
         d->pty->logout();
@@ -69,44 +76,44 @@ KPtyProcess::~KPtyProcess()
     delete d->pty;
 }
 
-void KPtyProcess::setPtyChannels(PtyChannels channels)
+void PseudoTerminalProcess::setPseudoTerminalChannels(PseudoTerminalChannels channels)
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
-    d->ptyChannels = channels;
+    d->pseudoTerminalChannels = channels;
 }
 
-KPtyProcess::PtyChannels KPtyProcess::ptyChannels() const
+PseudoTerminalProcess::PseudoTerminalChannels PseudoTerminalProcess::pseudoTerminalChannels() const
 {
-    Q_D(const KPtyProcess);
+    Q_D(const PseudoTerminalProcess);
 
-    return d->ptyChannels;
+    return d->pseudoTerminalChannels;
 }
 
-void KPtyProcess::setUseUtmp(bool value)
+void PseudoTerminalProcess::setUseUtmp(bool value)
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
     d->addUtmp = value;
 }
 
-bool KPtyProcess::isUseUtmp() const
+bool PseudoTerminalProcess::isUseUtmp() const
 {
-    Q_D(const KPtyProcess);
+    Q_D(const PseudoTerminalProcess);
 
     return d->addUtmp;
 }
 
-KPtyDevice *KPtyProcess::pty() const
+PseudoTerminalDevice *PseudoTerminalProcess::pty() const
 {
-    Q_D(const KPtyProcess);
+    Q_D(const PseudoTerminalProcess);
 
     return d->pty;
 }
 
-void KPtyProcess::setupChildProcess()
+void PseudoTerminalProcess::setupChildProcess()
 {
-    Q_D(KPtyProcess);
+    Q_D(PseudoTerminalProcess);
 
     d->pty->setCTty();
 
@@ -114,20 +121,19 @@ void KPtyProcess::setupChildProcess()
     if (d->addUtmp)
         d->pty->login(KUser(KUser::UseRealUserID).loginName().toLocal8Bit().data(), qgetenv("DISPLAY"));
 #endif
-    if (d->ptyChannels & StdinChannel)
+    if (d->pseudoTerminalChannels & StdinChannel)
         dup2(d->pty->slaveFd(), 0);
 
-    if (d->ptyChannels & StdoutChannel)
+    if (d->pseudoTerminalChannels & StdoutChannel)
         dup2(d->pty->slaveFd(), 1);
 
-    if (d->ptyChannels & StderrChannel)
+    if (d->pseudoTerminalChannels & StderrChannel)
         dup2(d->pty->slaveFd(), 2);
 
     Process::setupChildProcess();
 }
 
-void KPtyProcessPrivate::_k_onStateChanged(QProcess::ProcessState newState) {
+void PseudoTerminalProcessPrivate::_k_onStateChanged(QProcess::ProcessState newState) {
     if (newState == QProcess::NotRunning && addUtmp)
         pty->logout();
 }
-//#include "kptyprocess.moc"

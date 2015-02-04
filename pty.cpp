@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified
@@ -28,7 +35,7 @@
 
 // Own includes
 #include "pty.h"
-#include "kptydevice.h"
+#include "pseudoterminaldevice.h"
 
 // System includes
 #include <sys/types.h>
@@ -225,12 +232,12 @@ void Pty::setWriteable(bool writeable)
 }
 
 Pty::Pty(int masterFd, QObject* parent)
-    : KPtyProcess(masterFd,parent)
+    : PseudoTerminalProcess(masterFd,parent)
 {
     init();
 }
 Pty::Pty(QObject* parent)
-    : KPtyProcess(parent)
+    : PseudoTerminalProcess(parent)
 {
     init();
 }
@@ -243,7 +250,7 @@ void Pty::init()
     _utf8 =true;
 
     connect(pty(), SIGNAL(readyRead()) , this , SLOT(dataReceived()));
-    setPtyChannels(KPtyProcess::AllChannels);
+    setPseudoTerminalChannels(PseudoTerminalProcess::AllChannels);
 }
 
 Pty::~Pty()
@@ -293,7 +300,7 @@ int Pty::foregroundProcessGroup() const
 
 void Pty::setupChildProcess()
 {
-    KPtyProcess::setupChildProcess();
+    PseudoTerminalProcess::setupChildProcess();
     
     // reset all signal handlers
     // this ensures that terminal applications respond to

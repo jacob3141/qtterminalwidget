@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
     Copyright (C) 2007 by Robert Knight <robertknight@gmail.com>
 
     This program is free software; you can redistribute it and/or modify

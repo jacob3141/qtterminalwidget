@@ -1,4 +1,11 @@
 /*
+ * Modifications and refactoring. Part of QtTerminalWidget:
+ * https://github.com/cybercatalyst/qtterminalwidget
+ *
+ * Copyright (C) 2015 Jacob Dawid <jacob@omg-it.works>
+ */
+
+/*
  * This file is a part of QTerminal - http://gitorious.org/qterminal
  *
  * This file was un-linked from KDE and modified
@@ -30,11 +37,11 @@
 #pragma once
 
 #include "process.h"
-class KPtyDevice;
+class PseudoTerminalDevice;
 
 #include <signal.h>
 
-struct KPtyProcessPrivate;
+struct PseudoTerminalProcessPrivate;
 
 /**
  * This class extends KProcess by support for PTYs (pseudo TTYs).
@@ -51,13 +58,13 @@ struct KPtyProcessPrivate;
  *
  * @author Oswald Buddenhagen <ossi@kde.org>
  */
-class KPtyProcess : public Process
+class PseudoTerminalProcess : public Process
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(KPtyProcess)
+    Q_DECLARE_PRIVATE(PseudoTerminalProcess)
 
 public:
-    enum PtyChannelFlag {
+    enum PseudoTerminalChannelFlag {
         NoChannels = 0, /**< The PTY is not connected to any channel. */
         StdinChannel = 1, /**< Connect PTY to stdin. */
         StdoutChannel = 2, /**< Connect PTY to stdout. */
@@ -66,12 +73,12 @@ public:
         AllChannels = 7 /**< Connect PTY to all channels. */
     };
 
-    Q_DECLARE_FLAGS(PtyChannels, PtyChannelFlag)
+    Q_DECLARE_FLAGS(PseudoTerminalChannels, PseudoTerminalChannelFlag)
 
     /**
      * Constructor
      */
-    explicit KPtyProcess(QObject *parent = 0);
+    explicit PseudoTerminalProcess(QObject *parent = 0);
 
     /**
      * Construct a process using an open pty master.
@@ -80,12 +87,12 @@ public:
      *   The process does not take ownership of the descriptor;
      *   it will not be automatically closed at any point.
      */
-    KPtyProcess(int ptyMasterFd, QObject *parent = 0);
+    PseudoTerminalProcess(int ptyMasterFd, QObject *parent = 0);
 
     /**
      * Destructor
      */
-    virtual ~KPtyProcess();
+    virtual ~PseudoTerminalProcess();
 
     /**
      * Set to which channels the PTY should be assigned.
@@ -94,7 +101,7 @@ public:
      *
      * @param channels the output channel handling mode
      */
-    void setPtyChannels(PtyChannels channels);
+    void setPseudoTerminalChannels(PseudoTerminalChannels channels);
 
     bool isRunning() const
     {
@@ -108,7 +115,7 @@ public:
      *
      * @return the output channel handling mode
      */
-    PtyChannels ptyChannels() const;
+    PseudoTerminalChannels pseudoTerminalChannels() const;
 
     /**
      * Set whether to register the process as a TTY login in utmp.
@@ -135,7 +142,7 @@ public:
      *
      * @return the PTY device
      */
-    KPtyDevice *pty() const;
+    PseudoTerminalDevice *pty() const;
 
 protected:
     /**
@@ -152,18 +159,18 @@ private:
 // private data //
 //////////////////
 
-struct KPtyProcessPrivate : ProcessPrivate {
-    KPtyProcessPrivate() :
-        ptyChannels(KPtyProcess::NoChannels),
+struct PseudoTerminalProcessPrivate : ProcessPrivate {
+    PseudoTerminalProcessPrivate() :
+        pseudoTerminalChannels(PseudoTerminalProcess::NoChannels),
         addUtmp(false)
     {
     }
 
     void _k_onStateChanged(QProcess::ProcessState newState);
 
-    KPtyDevice *pty;
-    KPtyProcess::PtyChannels ptyChannels;
+    PseudoTerminalDevice *pty;
+    PseudoTerminalProcess::PseudoTerminalChannels pseudoTerminalChannels;
     bool addUtmp : 1;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KPtyProcess::PtyChannels)
+Q_DECLARE_OPERATORS_FOR_FLAGS(PseudoTerminalProcess::PseudoTerminalChannels)
