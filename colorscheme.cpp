@@ -21,7 +21,6 @@
 
 // Own includes
 #include "colorscheme.h"
-#include "tools.h"
 
 // Qt includes
 #include <QBrush>
@@ -602,7 +601,7 @@ bool ColorSchemeManager::loadColorScheme(const QString& filePath) {
 }
 
 QList<QString> ColorSchemeManager::listKDE3ColorSchemes() {
-    QString dname(get_color_schemes_dir());
+    QString dname(":/");
     QDir dir(dname);
     QStringList filters;
     filters << "*.schema";
@@ -615,7 +614,7 @@ QList<QString> ColorSchemeManager::listKDE3ColorSchemes() {
 }
 
 QList<QString> ColorSchemeManager::listColorSchemes() {
-    QString dname(get_color_schemes_dir());
+    QString dname(":/");
     QDir dir(dname);
     QStringList filters;
     filters << "*.colorscheme";
@@ -649,11 +648,11 @@ bool ColorSchemeManager::deleteColorScheme(const QString& name) {
     }
 }
 QString ColorSchemeManager::findColorSchemePath(const QString& name) const {
-    QString path(get_color_schemes_dir() + "/"+ name + ".colorscheme");
+    QString path(":/" + name + ".colorscheme");
     if ( !path.isEmpty() )
         return path;
 
-    path = get_color_schemes_dir() + "/"+ name + ".schema";
+    path = ":/" + name + ".schema";
 
     return path;
 }

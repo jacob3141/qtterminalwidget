@@ -10,7 +10,6 @@ HEADERS += \
            kpty_p.h \
            kptydevice.h \
            kptyprocess.h \
-           tools.h \
     terminalwidget.h \
     blockarray.h \
     character.h \
@@ -41,7 +40,6 @@ SOURCES += \
            kpty.cpp \
            kptydevice.cpp \
            kptyprocess.cpp \
-           tools.cpp \
     terminalwidget.cpp \
     blockarray.cpp \
     colorscheme.cpp \
@@ -63,4 +61,4 @@ RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc
 
-DEFINES += BUNDLE_KEYBOARDLAYOUTS
+DEFINES +=

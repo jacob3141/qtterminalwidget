@@ -21,7 +21,6 @@
 
 // Own includes
 #include "keyboardtranslator.h"
-#include "tools.h"
 
 // System includes
 #include <ctype.h>
@@ -51,13 +50,12 @@ KeyboardTranslatorManager::~KeyboardTranslatorManager()
 }
 QString KeyboardTranslatorManager::findTranslatorPath(const QString& name)
 {
-    return QString(get_kb_layout_dir() + name + ".keytab");
-    //return KGlobal::dirs()->findResource("data","konsole/"+name+".keytab");
+    return QString(":/" + name + ".keytab");
 }
 
 void KeyboardTranslatorManager::findTranslators()
 {
-    QDir dir(get_kb_layout_dir());
+    QDir dir(":/");
     QStringList filters;
     filters << "*.keytab";
     dir.setNameFilters(filters);
