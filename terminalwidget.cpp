@@ -37,11 +37,6 @@
 
 #define STEP_ZOOM 1
 
-void *createTermWidget(int startnow, void *parent)
-{
-    return (void*) new TerminalWidget(startnow, (QWidget*)parent);
-}
-
 struct TermWidgetImpl {
     TermWidgetImpl(QWidget* parent = 0);
 
@@ -52,17 +47,14 @@ struct TermWidgetImpl {
     TerminalDisplay* createTerminalDisplay(Session *session, QWidget* parent);
 };
 
-TermWidgetImpl::TermWidgetImpl(QWidget* parent)
-{
+TermWidgetImpl::TermWidgetImpl(QWidget* parent) {
     this->m_session = createSession(parent);
     this->m_terminalDisplay = createTerminalDisplay(this->m_session, parent);
 }
 
 
-Session *TermWidgetImpl::createSession(QWidget* parent)
-{
+Session *TermWidgetImpl::createSession(QWidget* parent) {
     Session *session = new Session(parent);
-
     session->setTitle(Session::NameRole, "TerminalWidget");
 
     /* Thats a freaking bad idea!!!!
@@ -73,88 +65,60 @@ Session *TermWidgetImpl::createSession(QWidget* parent)
      * But as iam not sure if you want to do anything else ill just let both checks in and set this to $SHELL anyway.
      */
     //session->setProgram("/bin/bash");
-
     session->setProgram(getenv("SHELL"));
-
-
 
     QStringList args("");
     session->setArguments(args);
     session->setAutoClose(true);
-
     session->setCodec(QTextCodec::codecForName("UTF-8"));
-
     session->setFlowControlEnabled(true);
     session->setHistoryType(HistoryTypeBuffer(1000));
-
     session->setDarkBackground(true);
-
     session->setKeyBindings("");
     return session;
 }
 
 TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QWidget* parent) {
     TerminalDisplay* display = new TerminalDisplay(parent);
-
     display->setBellMode(TerminalDisplay::NotifyBell);
     display->setTerminalSizeHint(true);
     display->setTripleClickMode(TerminalDisplay::SelectWholeLine);
     display->setTerminalSizeStartup(true);
-
     display->setRandomSeed(session->sessionId() * 31);
-
     return display;
 }
 
 
-TerminalWidget::TerminalWidget(bool startSession, QWidget *parent)
-    : QWidget(parent)
-{
-    init(startSession);
+TerminalWidget::TerminalWidget(QWidget *parent, bool startSession)
+    : QWidget(parent) {
+    initialize(startSession);
 }
 
-TerminalWidget::TerminalWidget(QWidget *parent)
-    : QWidget(parent)
-{
-    init(true);
-}
-
-void TerminalWidget::selectionChanged(bool textSelected)
-{
+void TerminalWidget::selectionChanged(bool textSelected) {
     emit copyAvailable(textSelected);
 }
 
-void TerminalWidget::find()
-{
+void TerminalWidget::find() {
     search(true, false);
 }
 
-void TerminalWidget::findNext()
-{
+void TerminalWidget::findNext() {
     search(true, true);
 }
 
-void TerminalWidget::findPrevious()
-{
+void TerminalWidget::findPrevious() {
     search(false, false);
 }
 
-void TerminalWidget::search(bool forwards, bool next)
-{
+void TerminalWidget::search(bool forwards, bool next) {
     int startColumn, startLine;
     
-    if (next) // search from just after current selection
-    {
+    if (next) {
         m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionEnd(startColumn, startLine);
         startColumn++;
-    }
-    else // search from start of current selection
-    {
+    } else {
         m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionStart(startColumn, startLine);
     }
-
-    qDebug() << "current selection starts at: " << startColumn << startLine;
-    qDebug() << "current cursor position: " << m_impl->m_terminalDisplay->screenWindow()->cursorPosition();
 
     QRegExp regExp(m_searchBar->searchText());
     regExp.setPatternSyntax(m_searchBar->useRegularExpression() ? QRegExp::RegExp : QRegExp::FixedString);
@@ -168,9 +132,7 @@ void TerminalWidget::search(bool forwards, bool next)
     historySearch->search();
 }
 
-
-void TerminalWidget::matchFound(int startColumn, int startLine, int endColumn, int endLine)
-{
+void TerminalWidget::matchFound(int startColumn, int startLine, int endColumn, int endLine) {
     ScreenWindow* sw = m_impl->m_terminalDisplay->screenWindow();
     qDebug() << "Scroll to" << startLine;
     sw->scrollTo(startLine);
@@ -180,18 +142,15 @@ void TerminalWidget::matchFound(int startColumn, int startLine, int endColumn, i
     sw->setSelectionEnd(endColumn, endLine - sw->currentLine());
 }
 
-void TerminalWidget::noMatchFound()
-{
+void TerminalWidget::noMatchFound() {
     m_impl->m_terminalDisplay->screenWindow()->clearSelection();
 }
 
-int TerminalWidget::getShellPID()
-{
+int TerminalWidget::getShellPID() {
     return m_impl->m_session->processId();
 }
 
-void TerminalWidget::changeDir(const QString & dir)
-{
+void TerminalWidget::changeDir(const QString & dir) {
     /*
        this is a very hackish way of trying to determine if the shell is in
        the foreground before attempting to change the directory.  It may not
@@ -209,15 +168,13 @@ void TerminalWidget::changeDir(const QString & dir)
     }
 }
 
-QSize TerminalWidget::sizeHint() const
-{
+QSize TerminalWidget::sizeHint() const {
     QSize size = m_impl->m_terminalDisplay->sizeHint();
     size.rheight() = 150;
     return size;
 }
 
-void TerminalWidget::startShellProgram()
-{
+void TerminalWidget::startShellProgram() {
     if ( m_impl->m_session->isRunning() ) {
         return;
     }
@@ -225,8 +182,7 @@ void TerminalWidget::startShellProgram()
     m_impl->m_session->run();
 }
 
-void TerminalWidget::init(bool startSession)
-{
+void TerminalWidget::initialize(bool startSession) {
     m_layout = new QVBoxLayout();
     m_layout->setMargin(0);
     setLayout(m_layout);
@@ -288,51 +244,43 @@ void TerminalWidget::init(bool startSession)
 }
 
 
-TerminalWidget::~TerminalWidget()
-{
+TerminalWidget::~TerminalWidget() {
     delete m_impl;
     emit destroyed();
 }
 
-
-void TerminalWidget::setTerminalFont(const QFont &font)
-{
+void TerminalWidget::setTerminalFont(const QFont &font) {
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->setVTFont(font);
 }
 
-QFont TerminalWidget::terminalFont()
-{
+QFont TerminalWidget::terminalFont() {
     if (!m_impl->m_terminalDisplay)
         return QFont();
     return m_impl->m_terminalDisplay->getVTFont();
 }
 
-void TerminalWidget::setTerminalOpacity(qreal level)
-{
+void TerminalWidget::setTerminalOpacity(qreal level) {
     if (!m_impl->m_terminalDisplay)
         return;
 
     m_impl->m_terminalDisplay->setOpacity(level);
 }
 
-void TerminalWidget::setShellProgram(const QString &shellProgram)
-{
+void TerminalWidget::setShellProgram(const QString &shellProgram) {
     if (!m_impl->m_session)
         return;
     m_impl->m_session->setProgram(shellProgram);
 }
 
-void TerminalWidget::setWorkingDirectory(const QString& dir)
-{
+void TerminalWidget::setWorkingDirectory(const QString& dir) {
     if (!m_impl->m_session)
         return;
     m_impl->m_session->setInitialWorkingDirectory(dir);
 }
 
-QString TerminalWidget::workingDirectory()
-{
+QString TerminalWidget::workingDirectory() {
     if (!m_impl->m_session)
         return QString();
 
@@ -374,11 +322,8 @@ void TerminalWidget::setColorScheme(const QString& origName) {
                 QFileInfo(origName).baseName() :
                 origName;
 
-    // avoid legacy (int) solution
-    if (!availableColorSchemes().contains(name))
-    {
-        if (isFile)
-        {
+    if(!availableColorSchemes().contains(name)) {
+        if (isFile) {
             if (ColorSchemeManager::instance()->loadCustomColorScheme(origName))
                 cs = ColorSchemeManager::instance()->findColorScheme(name);
             else
@@ -418,63 +363,50 @@ void TerminalWidget::setSize(int h, int v) {
     m_impl->m_terminalDisplay->setSize(h, v);
 }
 
-void TerminalWidget::setHistorySize(int lines)
-{
+void TerminalWidget::setHistorySize(int lines) {
     if (lines < 0)
         m_impl->m_session->setHistoryType(HistoryTypeFile());
     else
         m_impl->m_session->setHistoryType(HistoryTypeBuffer(lines));
 }
 
-void TerminalWidget::setScrollBarPosition(ScrollBarPosition pos)
-{
+void TerminalWidget::setScrollBarPosition(ScrollBarPosition pos) {
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->setScrollBarPosition((TerminalDisplay::ScrollBarPosition)pos);
 }
 
-void TerminalWidget::scrollToEnd()
-{
+void TerminalWidget::scrollToEnd() {
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->scrollToEnd();
 }
 
-void TerminalWidget::pasteText(const QString &text)
-{
+void TerminalWidget::pasteText(const QString &text) {
     m_impl->m_session->sendText(text);
 }
 
-void TerminalWidget::resizeEvent(QResizeEvent*)
-{
-    //qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
+void TerminalWidget::resizeEvent(QResizeEvent*) {
     m_impl->m_terminalDisplay->resize(this->size());
 }
 
-
-void TerminalWidget::sessionFinished()
-{
+void TerminalWidget::sessionFinished() {
     emit finished();
 }
 
-
-void TerminalWidget::copyClipboard()
-{
+void TerminalWidget::copyClipboard() {
     m_impl->m_terminalDisplay->copyClipboard();
 }
 
-void TerminalWidget::pasteClipboard()
-{
+void TerminalWidget::pasteClipboard() {
     m_impl->m_terminalDisplay->pasteClipboard();
 }
 
-void TerminalWidget::pasteSelection()
-{
+void TerminalWidget::pasteSelection() {
     m_impl->m_terminalDisplay->pasteSelection();
 }
 
-void TerminalWidget::setZoom(int step)
-{
+void TerminalWidget::setZoom(int step) {
     if (!m_impl->m_terminalDisplay)
         return;
     
@@ -484,130 +416,106 @@ void TerminalWidget::setZoom(int step)
     setTerminalFont(font);
 }
 
-void TerminalWidget::zoomIn()
-{
+void TerminalWidget::zoomIn() {
     setZoom(STEP_ZOOM);
 }
 
-void TerminalWidget::zoomOut()
-{
+void TerminalWidget::zoomOut() {
     setZoom(-STEP_ZOOM);
 }
 
-void TerminalWidget::setKeyBindings(const QString & kb)
-{
+void TerminalWidget::setKeyBindings(const QString & kb) {
     m_impl->m_session->setKeyBindings(kb);
 }
 
-void TerminalWidget::clear()
-{
+void TerminalWidget::clear() {
     m_impl->m_session->emulation()->reset();
     m_impl->m_session->refresh();
     m_impl->m_session->clearHistory();
 }
 
-void TerminalWidget::setFlowControlEnabled(bool enabled)
-{
+void TerminalWidget::setFlowControlEnabled(bool enabled) {
     m_impl->m_session->setFlowControlEnabled(enabled);
 }
 
-QStringList TerminalWidget::availableKeyBindings()
-{
+QStringList TerminalWidget::availableKeyBindings() {
     return KeyboardTranslatorManager::instance()->allTranslators();
 }
 
-QString TerminalWidget::keyBindings()
-{
+QString TerminalWidget::keyBindings() {
     return m_impl->m_session->keyBindings();
 }
 
-void TerminalWidget::toggleShowSearchBar()
-{
+void TerminalWidget::toggleShowSearchBar() {
     m_searchBar->isHidden() ? m_searchBar->show() : m_searchBar->hide();
 }
 
-bool TerminalWidget::flowControlEnabled(void)
-{
+bool TerminalWidget::flowControlEnabled(void) {
     return m_impl->m_session->flowControlEnabled();
 }
 
-void TerminalWidget::setFlowControlWarningEnabled(bool enabled)
-{
+void TerminalWidget::setFlowControlWarningEnabled(bool enabled) {
     if (flowControlEnabled()) {
         // Do not show warning label if flow control is disabled
         m_impl->m_terminalDisplay->setFlowControlWarningEnabled(enabled);
     }
 }
 
-void TerminalWidget::setEnvironment(const QStringList& environment)
-{
+void TerminalWidget::setEnvironment(const QStringList& environment) {
     m_impl->m_session->setEnvironment(environment);
 }
 
-void TerminalWidget::setMotionAfterPasting(int action)
-{
+void TerminalWidget::setMotionAfterPasting(int action) {
     m_impl->m_terminalDisplay->setMotionAfterPasting((MotionAfterPasting) action);
 }
 
-int TerminalWidget::historyLinesCount()
-{
+int TerminalWidget::historyLinesCount() {
     return m_impl->m_terminalDisplay->screenWindow()->screen()->getHistLines();
 }
 
-int TerminalWidget::screenColumnsCount()
-{
+int TerminalWidget::screenColumnsCount() {
     return m_impl->m_terminalDisplay->screenWindow()->screen()->getColumns();
 }
 
-void TerminalWidget::setSelectionStart(int row, int column)
-{
+void TerminalWidget::setSelectionStart(int row, int column) {
     m_impl->m_terminalDisplay->screenWindow()->screen()->setSelectionStart(column, row, true);
 }
 
-void TerminalWidget::setSelectionEnd(int row, int column)
-{
+void TerminalWidget::setSelectionEnd(int row, int column) {
     m_impl->m_terminalDisplay->screenWindow()->screen()->setSelectionEnd(column, row);
 }
 
-void TerminalWidget::getSelectionStart(int& row, int& column)
-{
+void TerminalWidget::getSelectionStart(int& row, int& column) {
     m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionStart(column, row);
 }
 
-void TerminalWidget::getSelectionEnd(int& row, int& column)
-{
+void TerminalWidget::getSelectionEnd(int& row, int& column) {
     m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionEnd(column, row);
 }
 
-QString TerminalWidget::selectedText(bool preserveLineBreaks)
-{
+QString TerminalWidget::selectedText(bool preserveLineBreaks) {
     return m_impl->m_terminalDisplay->screenWindow()->screen()->selectedText(preserveLineBreaks);
 }
 
-void TerminalWidget::setMonitorActivity(bool monitor)
-{
+void TerminalWidget::setMonitorActivity(bool monitor) {
     m_impl->m_session->setMonitorActivity(monitor);
 }
 
-void TerminalWidget::setMonitorSilence(bool monitor)
-{
+void TerminalWidget::setMonitorSilence(bool monitor) {
     m_impl->m_session->setMonitorSilence(monitor);
 }
 
-void TerminalWidget::setSilenceTimeout(int seconds)
-{
+void TerminalWidget::setSilenceTimeout(int seconds) {
     m_impl->m_session->setMonitorSilenceSeconds(seconds);
 }
 
-Filter::HotSpot* TerminalWidget::getHotSpotAt(const QPoint &pos) const
-{
+Filter::HotSpot* TerminalWidget::getHotSpotAt(const QPoint &pos) const {
     int row = 0, column = 0;
     m_impl->m_terminalDisplay->getCharacterPosition(pos, row, column);
     return getHotSpotAt(row, column);
 }
 
-Filter::HotSpot* TerminalWidget::getHotSpotAt(int row, int column) const
-{
+Filter::HotSpot* TerminalWidget::getHotSpotAt(int row, int column) const {
     return m_impl->m_terminalDisplay->filterChain()->hotSpotAt(row, column);
 }
 

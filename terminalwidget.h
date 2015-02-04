@@ -42,14 +42,11 @@ public:
     };
 
     /**
-     * Creates a new terminal widgets.
+     * Creates a new terminal widget.
      * @param startSession Indicates whether a new session should be started.
      * @param parent The parent widget.
      */
-    TerminalWidget(bool startSession,
-                   QWidget *parent = 0);
-
-    TerminalWidget(QWidget *parent = 0);
+    TerminalWidget(QWidget *parent = 0, bool startSession = true);
 
     virtual ~TerminalWidget();
 
@@ -220,7 +217,7 @@ private slots:
 private:
     void search(bool forwards, bool next);
     void setZoom(int step);
-    void init(bool startSession);
+    void initialize(bool startSession);
 
     TermWidgetImpl * m_impl;
     SearchBar* m_searchBar;
