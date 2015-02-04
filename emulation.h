@@ -23,7 +23,6 @@
 #pragma once
 
 // Own includes
-#define KONSOLEPRIVATE_EXPORT
 class KeyboardTranslator;
 class HistoryType;
 class Screen;
@@ -112,7 +111,7 @@ enum {
  * how long the emulation has been active/idle for and also respond to
  * a 'bell' event in different ways.
  */
-class KONSOLEPRIVATE_EXPORT Emulation : public QObject
+class Emulation : public QObject
 { 
     Q_OBJECT
 

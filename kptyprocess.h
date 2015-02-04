@@ -29,7 +29,6 @@
 
 #pragma once
 
-
 #include "kprocess.h"
 #include "kptydevice.h"
 

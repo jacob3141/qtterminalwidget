@@ -354,10 +354,6 @@ public:
      */
     void refresh();
 
-    //  void startZModem(const QString &rz, const QString &dir, const QStringList &list);
-    //  void cancelZModem();
-    //  bool isZModemBusy() { return _zmodemBusy; }
-
 public slots:
 
     /**
@@ -430,9 +426,6 @@ signals:
     /** TODO: Document me. */
     void openUrlRequest(const QString & url);
 
-    /** TODO: Document me. */
-    //  void zmodemDetected();
-
     /**
      * Emitted when the terminal process requests a change
      * in the size of the terminal window.
@@ -462,8 +455,6 @@ signals:
 private slots:
     void done(int);
 
-    //  void fireZModemDetected();
-
     void onReceiveBlock( const char * buffer, int len );
     void monitorTimerDone();
 
@@ -472,16 +463,9 @@ private slots:
 
     void activityStateSet(int);
 
-    //automatically detach views from sessions when view is destroyed
     void viewDestroyed(QObject * view);
 
-    //  void zmodemReadStatus();
-    //  void zmodemReadAndSendBlock();
-    //  void zmodemRcvBlock(const char *data, int len);
-    //  void zmodemFinished();
-
 private:
-
     void updateTerminalSize();
     WId windowId() const;
 
@@ -523,13 +507,7 @@ private:
 
     QString        _initialWorkingDir;
 
-    // ZModem
-    //  bool           _zmodemBusy;
-    //  KProcess*      _zmodemProc;
-    //  ZModemDialog*  _zmodemProgress;
-
     // Color/Font Changes by ESC Sequences
-
     QColor         _modifiedBackground; // as set by: echo -en '\033]11;Color\007
 
     QString        _profileKey;
@@ -606,7 +584,7 @@ private:
     void connectAll(bool connect);
     QList<Session *> masters() const;
 
-    // maps sessions to their master status
+    /** maps sessions to their master status */
     QHash<Session *,bool> _sessions;
 
     int _masterMode;

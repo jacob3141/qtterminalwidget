@@ -23,7 +23,6 @@
 // Own includes
 #include "filter.h"
 #include "character.h"
-#define KONSOLEPRIVATE_EXPORT
 class ScreenWindow;
 
 // Qt
@@ -44,9 +43,7 @@ class QHideEvent;
 class QTimerEvent;
 class QWidget;
 
-
-enum MotionAfterPasting
-{
+enum MotionAfterPasting {
     // No move screenwindow after pasting
     NoMoveScreenWindow = 0,
     // Move start of screenwindow after pasting
@@ -54,7 +51,6 @@ enum MotionAfterPasting
     // Move end of screenwindow after pasting
     MoveEndScreenWindow = 2
 };
-
 
 extern unsigned short vt100_graphics[32];
 
@@ -67,8 +63,7 @@ extern unsigned short vt100_graphics[32];
  *
  * TODO More documentation
  */
-class KONSOLEPRIVATE_EXPORT TerminalDisplay : public QWidget
-{
+class TerminalDisplay : public QWidget {
     Q_OBJECT
 
 public:

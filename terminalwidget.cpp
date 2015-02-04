@@ -107,16 +107,16 @@ TerminalDisplay *TermWidgetImpl::createTerminalDisplay(Session *session, QWidget
 }
 
 
-TerminalWidget::TerminalWidget(int startnow, QWidget *parent)
+TerminalWidget::TerminalWidget(bool startSession, QWidget *parent)
     : QWidget(parent)
 {
-    init(startnow);
+    init(startSession);
 }
 
 TerminalWidget::TerminalWidget(QWidget *parent)
     : QWidget(parent)
 {
-    init(1);
+    init(true);
 }
 
 void TerminalWidget::selectionChanged(bool textSelected)
@@ -205,7 +205,7 @@ void TerminalWidget::changeDir(const QString & dir)
 
     if (!retval) {
         QString cmd = "cd " + dir + "\n";
-        sendText(cmd);
+        pasteText(cmd);
     }
 }
 
@@ -225,7 +225,7 @@ void TerminalWidget::startShellProgram()
     m_impl->m_session->run();
 }
 
-void TerminalWidget::init(int startnow)
+void TerminalWidget::init(bool startSession)
 {
     m_layout = new QVBoxLayout();
     m_layout->setMargin(0);
@@ -254,7 +254,7 @@ void TerminalWidget::init(int startnow)
     m_layout->addWidget(m_searchBar);
     m_searchBar->hide();
 
-    if (startnow && m_impl->m_session) {
+    if (startSession && m_impl->m_session) {
         m_impl->m_session->run();
     }
 
@@ -302,7 +302,7 @@ void TerminalWidget::setTerminalFont(const QFont &font)
     m_impl->m_terminalDisplay->setVTFont(font);
 }
 
-QFont TerminalWidget::getTerminalFont()
+QFont TerminalWidget::terminalFont()
 {
     if (!m_impl->m_terminalDisplay)
         return QFont();
@@ -317,11 +317,11 @@ void TerminalWidget::setTerminalOpacity(qreal level)
     m_impl->m_terminalDisplay->setOpacity(level);
 }
 
-void TerminalWidget::setShellProgram(const QString &progname)
+void TerminalWidget::setShellProgram(const QString &shellProgram)
 {
     if (!m_impl->m_session)
         return;
-    m_impl->m_session->setProgram(progname);
+    m_impl->m_session->setProgram(shellProgram);
 }
 
 void TerminalWidget::setWorkingDirectory(const QString& dir)
@@ -354,22 +354,19 @@ fallback:
     return m_impl->m_session->initialWorkingDirectory();
 }
 
-void TerminalWidget::setArgs(const QStringList &args)
-{
+void TerminalWidget::setShellProgramArguments(const QStringList &arguments) {
     if (!m_impl->m_session)
         return;
-    m_impl->m_session->setArguments(args);
+    m_impl->m_session->setArguments(arguments);
 }
 
-void TerminalWidget::setTextCodec(QTextCodec *codec)
-{
+void TerminalWidget::setTextCodec(QTextCodec *codec) {
     if (!m_impl->m_session)
         return;
     m_impl->m_session->setCodec(codec);
 }
 
-void TerminalWidget::setColorScheme(const QString& origName)
-{
+void TerminalWidget::setColorScheme(const QString& origName) {
     const ColorScheme *cs = 0;
 
     const bool isFile = QFile::exists(origName);
@@ -408,16 +405,14 @@ void TerminalWidget::setColorScheme(const QString& origName)
     m_impl->m_terminalDisplay->setColorTable(table);
 }
 
-QStringList TerminalWidget::availableColorSchemes()
-{
+QStringList TerminalWidget::availableColorSchemes() {
     QStringList ret;
     foreach (const ColorScheme* cs, ColorSchemeManager::instance()->allColorSchemes())
         ret.append(cs->name());
     return ret;
 }
 
-void TerminalWidget::setSize(int h, int v)
-{
+void TerminalWidget::setSize(int h, int v) {
     if (!m_impl->m_terminalDisplay)
         return;
     m_impl->m_terminalDisplay->setSize(h, v);
@@ -445,7 +440,7 @@ void TerminalWidget::scrollToEnd()
     m_impl->m_terminalDisplay->scrollToEnd();
 }
 
-void TerminalWidget::sendText(const QString &text)
+void TerminalWidget::pasteText(const QString &text)
 {
     m_impl->m_session->sendText(text);
 }

@@ -22,7 +22,6 @@
 #pragma once
 
 // Own includes
-#define KONSOLEPRIVATE_EXPORT
 class QIODevice;
 class QTextStream;
 
@@ -437,7 +436,7 @@ private:
  * Manages the keyboard translations available for use by terminal sessions,
  * see KeyboardTranslator.
  */
-class KONSOLEPRIVATE_EXPORT KeyboardTranslatorManager
+class KeyboardTranslatorManager
 {
 public:
     /**

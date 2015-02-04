@@ -541,17 +541,18 @@ public:
 
 private: 
 
-    //copies a line of text from the screen or history into a stream using a
-    //specified character decoder.  Returns the number of lines actually copied,
-    //which may be less than 'count' if (start+count) is more than the number of characters on
-    //the line
-    //
-    //line - the line number to copy, from 0 (the earliest line in the history) up to
-    //         history->getLines() + lines - 1
-    //start - the first column on the line to copy
-    //count - the number of characters on the line to copy
-    //decoder - a decoder which converts terminal characters (an Character array) into text
-    //appendNewLine - if true a new line character (\n) is appended to the end of the line
+    /** Copies a line of text from the screen or history into a stream using a
+      * specified character decoder.  Returns the number of lines actually copied,
+      * which may be less than 'count' if (start+count) is more than the number of characters on
+      * the line
+      *
+      * line - the line number to copy, from 0 (the earliest line in the history) up to
+      *          history->getLines() + lines - 1
+      * start - the first column on the line to copy
+      * count - the number of characters on the line to copy
+      * decoder - a decoder which converts terminal characters (an Character array) into text
+      * appendNewLine - if true a new line character (\n) is appended to the end of the line
+      */
     int  copyLineToStream(int line,
                           int start,
                           int count,
@@ -559,20 +560,26 @@ private:
                           bool appendNewLine,
                           bool preserveLineBreaks) const;
     
-    //fills a section of the screen image with the character 'c'
-    //the parameters are specified as offsets from the start of the screen image.
-    //the loc(x,y) macro can be used to generate these values from a column,line pair.
+    /**
+      * fills a section of the screen image with the character 'c'
+      * the parameters are specified as offsets from the start of the screen image.
+      * the loc(x,y) macro can be used to generate these values from a column,line pair.
+      */
     void clearImage(int loca, int loce, char c);
 
-    //move screen image between 'sourceBegin' and 'sourceEnd' to 'dest'.
-    //the parameters are specified as offsets from the start of the screen image.
-    //the loc(x,y) macro can be used to generate these values from a column,line pair.
-    //
-    //NOTE: moveImage() can only move whole lines
+    /**
+      * move screen image between 'sourceBegin' and 'sourceEnd' to 'dest'.
+      * the parameters are specified as offsets from the start of the screen image.
+      * the loc(x,y) macro can be used to generate these values from a column,line pair.
+      *
+      * NOTE: moveImage() can only move whole lines
+      */
     void moveImage(int dest, int sourceBegin, int sourceEnd);
-    // scroll up 'i' lines in current region, clearing the bottom 'i' lines
+
+    /** scroll up 'i' lines in current region, clearing the bottom 'i' lines */
     void scrollUp(int from, int i);
-    // scroll down 'i' lines in current region, clearing the top 'i' lines
+
+    /** scroll down 'i' lines in current region, clearing the top 'i' lines */
     void scrollDown(int from, int i);
 
     void addHistLine();
@@ -583,15 +590,24 @@ private:
     void reverseRendition(Character& p) const;
 
     bool isSelectionValid() const;
-    // copies text from 'startIndex' to 'endIndex' to a stream
-    // startIndex and endIndex are positions generated using the loc(x,y) macro
+
+    /**
+      * copies text from 'startIndex' to 'endIndex' to a stream
+      * startIndex and endIndex are positions generated using the loc(x,y) macro
+      */
     void writeToStream(TerminalCharacterDecoder* decoder, int startIndex,
                        int endIndex, bool preserveLineBreaks = true) const;
-    // copies 'count' lines from the screen buffer into 'dest',
-    // starting from 'startLine', where 0 is the first line in the screen buffer
+
+    /**
+      * copies 'count' lines from the screen buffer into 'dest',
+      * starting from 'startLine', where 0 is the first line in the screen buffer
+      */
     void copyFromScreen(Character* dest, int startLine, int count) const;
-    // copies 'count' lines from the history buffer into 'dest',
-    // starting from 'startLine', where 0 is the first line in the history
+
+    /**
+      * copies 'count' lines from the history buffer into 'dest',
+      * starting from 'startLine', where 0 is the first line in the history
+      */
     void copyFromHistory(Character* dest, int startLine, int count) const;
 
 

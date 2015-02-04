@@ -52,12 +52,9 @@
  * To start the terminal process, call the start() method
  * with the program name and appropriate arguments.
  */
-class Pty: public KPtyProcess
-{
+class Pty: public KPtyProcess {
     Q_OBJECT
-
 public:
-    
     /**
      * Constructs a new Pty.
      *
@@ -143,7 +140,6 @@ public:
     int foregroundProcessGroup() const;
 
 public slots:
-
     /**
      * Put the pty into UTF-8 mode on systems which support it.
      */
@@ -170,7 +166,6 @@ public slots:
     void sendData(const char* buffer, int length);
 
 signals:
-
     /**
      * Emitted when a new block of data is received from
      * the teletype.
@@ -184,14 +179,11 @@ protected:
     void setupChildProcess();
 
 private slots:
-    // called when data is received from the terminal process
     void dataReceived();
     
 private:
     void init();
 
-    // takes a list of key=value pairs and adds them
-    // to the environment for the process
     void addEnvironmentVariables(const QStringList& environment);
 
     int  _windowColumns;

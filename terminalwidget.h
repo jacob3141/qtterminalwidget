@@ -41,47 +41,48 @@ public:
         ScrollBarRight=2
     };
 
-    TerminalWidget(int startnow, // 1 = start shell programm immediatelly
-                   QWidget * parent = 0);
+    /**
+     * Creates a new terminal widgets.
+     * @param startSession Indicates whether a new session should be started.
+     * @param parent The parent widget.
+     */
+    TerminalWidget(bool startSession,
+                   QWidget *parent = 0);
 
     TerminalWidget(QWidget *parent = 0);
 
     virtual ~TerminalWidget();
 
-    //Initial size
     QSize sizeHint() const;
 
-    //start shell program if it was not started in constructor
     void startShellProgram();
 
     int getShellPID();
 
-    void changeDir(const QString & dir);
+    void changeDir(const QString& dir);
 
-    //look-n-feel, if you don`t like defaults
+    void setTerminalFont(const QFont& font);
+    QFont terminalFont();
 
-    //  Terminal font
-    // Default is application font with family Monospace, size 10
-    // USE ONLY FIXED-PITCH FONT!
-    // otherwise symbols' position could be incorrect
-    void setTerminalFont(const QFont & font);
-    QFont getTerminalFont();
     void setTerminalOpacity(qreal level);
 
-    //environment
-    void setEnvironment(const QStringList & environment);
+    /**
+     * Sets a set of environment variables.
+     * @param environment The environment variables.
+     */
+    void setEnvironment(const QStringList& environment);
 
-    //  Shell program, default is /bin/bash
-    void setShellProgram(const QString & progname);
+    /** Set the shell program. Defaults to /bin/bash. */
+    void setShellProgram(const QString& shellProgram);
 
-    //working directory
+    /** Shell program arguments. Default to none. */
+    void setShellProgramArguments(const QStringList& arguments);
+
     void setWorkingDirectory(const QString & dir);
     QString workingDirectory();
 
-    // Shell program args, default is none
-    void setArgs(const QStringList & args);
 
-    //Text codec, default is UTF-8
+    /** Sets the text codec. Defaults to UTF-8. */
     void setTextCodec(QTextCodec * codec);
 
     /** @brief Sets the color scheme, default is white on black
@@ -92,25 +93,25 @@ public:
     void setColorScheme(const QString & name);
     static QStringList availableColorSchemes();
 
-    //set size
+    /** Sets the terminal screen size. */
     void setSize(int h, int v);
 
-    // History size for scrolling
+    /** Sets the history size for scrolling in lines. */
     void setHistorySize(int lines); //infinite if lines < 0
 
-    // Presence of scrollbar
+    /** Sets the scrollbar position. */
     void setScrollBarPosition(ScrollBarPosition);
 
-    // Wrapped, scroll to end.
+    /** Scrolls to the end of the terminal. */
     void scrollToEnd();
 
-    // Send some text to terminal
-    void sendText(const QString & text);
+    /** Pastes text into the terminal (as if it was typed in). */
+    void pasteText(const QString& text);
 
-    // Sets whether flow control is enabled
+    /** Sets whether flow control is enabled. */
     void setFlowControlEnabled(bool enabled);
 
-    // Returns whether flow control is enabled
+    /** @returns whether flow control is enabled */
     bool flowControlEnabled(void);
 
     /**
@@ -119,11 +120,10 @@ public:
      */
     void setFlowControlWarningEnabled(bool enabled);
 
-    /*! Get all available keyboard bindings
-     */
+    /** Get all available keyboard bindings. */
     static QStringList availableKeyBindings();
 
-    //! Return current key bindings
+    /** Return current key bindings.*/
     QString keyBindings();
     
     void setMotionAfterPasting(int);
@@ -181,27 +181,26 @@ signals:
     void silence();
 
 public slots:
-    // Copy selection to clipboard
+    /** Copies selection to clipboard. */
     void copyClipboard();
 
-    // Paste clipboard to terminal
+    /** Pastes clipboard to terminal. */
     void pasteClipboard();
 
-    // Paste selection to terminal
+    /** Paste selection to terminal. */
     void pasteSelection();
 
-    // Set zoom
+    /** Sets the zoom. */
     void zoomIn();
     void zoomOut();
     
-    /*! Set named key binding for given widget
-     */
+    /** Set named key binding for given widget. */
     void setKeyBindings(const QString & kb);
 
-    /*! Clear the terminal content and move to home position
-     */
+    /** Clear the terminal content and move to home position. */
     void clear();
 
+    /** Toggles the search bar. */
     void toggleShowSearchBar();
 
 protected:
@@ -221,17 +220,9 @@ private slots:
 private:
     void search(bool forwards, bool next);
     void setZoom(int step);
-    void init(int startnow);
+    void init(bool startSession);
+
     TermWidgetImpl * m_impl;
     SearchBar* m_searchBar;
     QVBoxLayout *m_layout;
 };
-
-
-//Maybe useful, maybe not
-
-#ifdef __cplusplus
-extern "C"
-#endif
-void * createTermWidget(int startnow, void * parent);
-

@@ -29,9 +29,11 @@
 
 #pragma once
 
-#include <QProcess>
-
+// Own includes
 class KProcessPrivate;
+
+// Qt includes
+#include <QProcess>
 
 /**
  * \class KProcess kprocess.h <KProcess>
@@ -46,13 +48,11 @@ class KProcessPrivate;
  *
  * @author Oswald Buddenhagen <ossi@kde.org>
  **/
-class KProcess : public QProcess
-{
+class KProcess : public QProcess {
     Q_OBJECT
     Q_DECLARE_PRIVATE(KProcess)
 
 public:
-
     /**
      * Modes in which the output channels can be opened.
      */
@@ -332,7 +332,6 @@ protected:
     KProcessPrivate * const d_ptr;
 
 private:
-    // hide those
     using QProcess::setReadChannelMode;
     using QProcess::readChannelMode;
     using QProcess::setProcessChannelMode;
@@ -342,9 +341,7 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _k_forwardStderr())
 };
 
-/* ----------- kprocess_p.h ---------------- */
 class KProcessPrivate {
-
     Q_DECLARE_PUBLIC(KProcess)
 
 protected:
@@ -364,4 +361,3 @@ protected:
 
     KProcess *q_ptr;
 };
-/* ------------------------------------------- */
