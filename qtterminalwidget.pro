@@ -20,7 +20,6 @@ HEADERS += \
     historysearch.h \
     keyboardtranslator.h \
     linefont.h \
-    pty.h \
     screen.h \
     searchbar.h \
     shellcommand.h \
@@ -44,7 +43,6 @@ SOURCES += \
     history.cpp \
     historysearch.cpp \
     keyboardtranslator.cpp \
-    pty.cpp \
     screen.cpp \
     screenwindow.cpp \
     searchbar.cpp \

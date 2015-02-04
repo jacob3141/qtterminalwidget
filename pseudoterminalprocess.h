@@ -36,12 +36,19 @@
 
 #pragma once
 
+// Own includes
 #include "process.h"
 class PseudoTerminalDevice;
+struct PseudoTerminalProcessPrivate;
 
+// System includes
 #include <signal.h>
 
-struct PseudoTerminalProcessPrivate;
+// Qt includes
+#include <QStringList>
+#include <QVector>
+#include <QList>
+#include <QSize>
 
 /**
  * This class extends KProcess by support for PTYs (pseudo TTYs).
@@ -58,8 +65,7 @@ struct PseudoTerminalProcessPrivate;
  *
  * @author Oswald Buddenhagen <ossi@kde.org>
  */
-class PseudoTerminalProcess : public Process
-{
+class PseudoTerminalProcess : public Process {
     Q_OBJECT
     Q_DECLARE_PRIVATE(PseudoTerminalProcess)
 
@@ -93,6 +99,71 @@ public:
      * Destructor
      */
     virtual ~PseudoTerminalProcess();
+
+    /**
+     * Starts the terminal process.
+     *
+     * Returns 0 if the process was started successfully or non-zero
+     * otherwise.
+     *
+     * @param program Path to the program to start
+     * @param arguments Arguments to pass to the program being started
+     * @param environment A list of key=value pairs which will be added
+     * to the environment for the new process.  At the very least this
+     * should include an assignment for the TERM environment variable.
+     * @param winid Specifies the value of the WINDOWID environment variable
+     * in the process's environment.
+     * @param addToUtmp Specifies whether a utmp entry should be created for
+     * the pty used.  See K3Process::setUsePty()
+     * @param dbusService Specifies the value of the KONSOLE_DBUS_SERVICE
+     * environment variable in the process's environment.
+     * @param dbusSession Specifies the value of the KONSOLE_DBUS_SESSION
+     * environment variable in the process's environment.
+     */
+    int start( QString program,
+               QStringList arguments,
+               QStringList environment,
+               ulong winid,
+               bool addToUtmp
+               );
+
+    /** TODO: Document me */
+    void setWriteable(bool writeable);
+
+    /**
+     * Enables or disables Xon/Xoff flow control.  The flow control setting
+     * may be changed later by a terminal application, so flowControlEnabled()
+     * may not equal the value of @p on in the previous call to setFlowControlEnabled()
+     */
+    void setFlowControlEnabled(bool on);
+
+    /** Queries the terminal state and returns true if Xon/Xoff flow control is enabled. */
+    bool flowControlEnabled() const;
+
+    /**
+     * Sets the size of the window (in lines and columns of characters)
+     * used by this teletype.
+     */
+    void setWindowSize(int lines, int cols);
+
+    /** Returns the size of the window used by this teletype.  See setWindowSize() */
+    QSize windowSize() const;
+
+    /** TODO Document me */
+    void setErase(char erase);
+
+    /** */
+    char erase() const;
+
+    /**
+     * Returns the process id of the teletype's current foreground
+     * process.  This is the process which is currently reading
+     * input sent to the terminal via. sendData()
+     *
+     * If there is a problem reading the foreground process group,
+     * 0 will be returned.
+     */
+    int foregroundProcessGroup() const;
 
     /**
      * Set to which channels the PTY should be assigned.
@@ -144,13 +215,62 @@ public:
      */
     PseudoTerminalDevice *pty() const;
 
+public slots:
+    /**
+     * Put the pty into UTF-8 mode on systems which support it.
+     */
+    void setUtf8Mode(bool on);
+
+    /**
+     * Suspend or resume processing of data from the standard
+     * output of the terminal process.
+     *
+     * See K3Process::suspend() and K3Process::resume()
+     *
+     * @param lock If true, processing of output is suspended,
+     * otherwise processing is resumed.
+     */
+    void lockPty(bool lock);
+
+    /**
+     * Sends data to the process currently controlling the
+     * teletype ( whose id is returned by foregroundProcessGroup() )
+     *
+     * @param buffer Pointer to the data to send.
+     * @param length Length of @p buffer.
+     */
+    void sendData(const char* buffer, int length);
+
+signals:
+    /**
+     * Emitted when a new block of data is received from
+     * the teletype.
+     *
+     * @param buffer Pointer to the data received.
+     * @param length Length of @p buffer
+     */
+    void receivedData(const char* buffer, int length);
+
 protected:
     /**
      * @reimp
      */
     virtual void setupChildProcess();
 
+private slots:
+    void dataReceived();
+
 private:
+    void init();
+
+    void addEnvironmentVariables(QStringList environment);
+
+    int  _windowColumns;
+    int  _windowLines;
+    char _eraseChar;
+    bool _xonXoff;
+    bool _utf8;
+
     Q_PRIVATE_SLOT(d_func(), void _k_onStateChanged(QProcess::ProcessState))
 };
 
