@@ -1,4 +1,6 @@
 # QtTerminalWidget
+![Screenshot](https://github.com/cybercatalyst/qtterminalwidget/blob/master/screenshot.png "Screenshot")
+
 QTermWidget is an opensource project originally based on KDE4 Konsole application,
 but it took its own direction later.
 The main goal of this project is to provide unicode-enabled, embeddable
