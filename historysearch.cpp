@@ -26,7 +26,7 @@
 
 // Own includes
 #include "terminalcharacterdecoder.h"
-#include "emulation.h"
+#include "terminalemulation.h"
 #include "historysearch.h"
 
 // Qt includes

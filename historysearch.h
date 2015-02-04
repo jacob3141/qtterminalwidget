@@ -29,7 +29,7 @@
 // Own includes
 #include "terminalsession.h"
 #include "screenwindow.h"
-#include "emulation.h"
+#include "terminalemulation.h"
 #include "terminalcharacterdecoder.h"
 
 // Qt includes
@@ -37,7 +37,7 @@
 #include <QPointer>
 #include <QMap>
 
-typedef QPointer<Emulation> EmulationPtr;
+typedef QPointer<TerminalEmulation> EmulationPtr;
 
 class HistorySearch : public QObject
 {

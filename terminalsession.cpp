@@ -31,10 +31,10 @@
 
 // Own includes
 #include "terminalsession.h"
-#include "pty.h"
 #include "terminaldisplay.h"
 #include "shellcommand.h"
 #include "vt102emulation.h"
+#include "pseudoterminalprocess.h"
 
 // Standard includes
 #include <assert.h>
@@ -55,60 +55,43 @@ int TerminalSession::lastSessionId = 0;
 TerminalSession::TerminalSession(QObject* parent) :
     QObject(parent),
     _shellProcess(0)
-  , _emulation(0)
+  , _terminalEmulation(0)
   , _monitorActivity(false)
   , _monitorSilence(false)
   , _notifiedActivity(false)
   , _autoClose(true)
   , _wantedClose(false)
   , _silenceSeconds(10)
-  , _addToUtmp(false)  // disabled by default because of a bug encountered on certain systems
-  // which caused Konsole to hang when closing a tab and then opening a new
-  // one.  A 'QProcess destroyed while still running' warning was being
-  // printed to the terminal.  Likely a problem in KPty::logout()
-  // or KPty::login() which uses a QProcess to start /usr/bin/utempter
+  , _addToUtmp(false)
   , _flowControl(true)
   , _fullScripting(false)
-  , _sessionId(0)
-  //   , _zmodemBusy(false)
-  //   , _zmodemProc(0)
-  //   , _zmodemProgress(0)
-  , _hasDarkBackground(false)
-{
-    //prepare DBus communication
-    //    new SessionAdaptor(this);
-    _sessionId = ++lastSessionId;
-    //    QDBusConnection::sessionBus().registerObject(QLatin1String("/Sessions/")+QString::number(_sessionId), this);
+  , _sessionId(0) {
 
-    //create teletype for I/O with shell process
-    _shellProcess = new Pty();
+    _sessionId = ++lastSessionId;
+
+    _shellProcess = new PseudoTerminalProcess();
 
     //create emulation backend
-    _emulation = new Vt102Emulation();
+    _terminalEmulation = new Vt102Emulation();
 
-    connect( _emulation, SIGNAL( titleChanged( int, QString ) ),
+    connect( _terminalEmulation, SIGNAL( titleChanged( int, QString ) ),
              this, SLOT( setUserTitle( int, QString ) ) );
-    connect( _emulation, SIGNAL( stateSet(int) ),
+    connect( _terminalEmulation, SIGNAL( stateSet(int) ),
              this, SLOT( activityStateSet(int) ) );
-    //    connect( _emulation, SIGNAL( zmodemDetected() ), this ,
-    //            SLOT( fireZModemDetected() ) );
-    connect( _emulation, SIGNAL( changeTabTextColorRequest( int ) ),
+    connect( _terminalEmulation, SIGNAL( changeTabTextColorRequest( int ) ),
              this, SIGNAL( changeTabTextColorRequest( int ) ) );
-    connect( _emulation, SIGNAL(profileChangeCommandReceived(QString)),
+    connect( _terminalEmulation, SIGNAL(profileChangeCommandReceived(QString)),
              this, SIGNAL( profileChangeCommandReceived(QString)) );
-    // TODO
-    // connect( _emulation,SIGNAL(imageSizeChanged(int,int)) , this ,
-    //        SLOT(onEmulationSizeChange(int,int)) );
 
     //connect teletype to emulation backend
-    _shellProcess->setUtf8Mode(_emulation->utf8());
+    _shellProcess->setUtf8Mode(_terminalEmulation->utf8());
 
     connect( _shellProcess,SIGNAL(receivedData(const char *,int)),this,
              SLOT(onReceiveBlock(const char *,int)) );
-    connect( _emulation,SIGNAL(sendData(const char *,int)),_shellProcess,
+    connect( _terminalEmulation,SIGNAL(sendData(const char *,int)),_shellProcess,
              SLOT(sendData(const char *,int)) );
-    connect( _emulation,SIGNAL(lockPtyRequest(bool)),_shellProcess,SLOT(lockPty(bool)) );
-    connect( _emulation,SIGNAL(useUtf8Request(bool)),_shellProcess,SLOT(setUtf8Mode(bool)) );
+    connect( _terminalEmulation,SIGNAL(lockPtyRequest(bool)),_shellProcess,SLOT(lockPty(bool)) );
+    connect( _terminalEmulation,SIGNAL(useUtf8Request(bool)),_shellProcess,SLOT(setUtf8Mode(bool)) );
 
     connect( _shellProcess,SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(done(int)) );
     // not in kprocess anymore connect( _shellProcess,SIGNAL(done(int)), this, SLOT(done(int)) );
@@ -148,14 +131,6 @@ WId TerminalSession::windowId() const
     }
 }
 
-void TerminalSession::setDarkBackground(bool darkBackground)
-{
-    _hasDarkBackground = darkBackground;
-}
-bool TerminalSession::hasDarkBackground() const
-{
-    return _hasDarkBackground;
-}
 bool TerminalSession::isRunning() const
 {
     return _shellProcess->state() == QProcess::Running;
@@ -190,23 +165,23 @@ void TerminalSession::addView(TerminalDisplay * widget)
 
     _views.append(widget);
 
-    if ( _emulation != 0 ) {
+    if ( _terminalEmulation != 0 ) {
         // connect emulation - view signals and slots
-        connect( widget , SIGNAL(keyPressedSignal(QKeyEvent *)) , _emulation ,
+        connect( widget , SIGNAL(keyPressedSignal(QKeyEvent *)) , _terminalEmulation ,
                  SLOT(sendKeyEvent(QKeyEvent *)) );
-        connect( widget , SIGNAL(mouseSignal(int,int,int,int)) , _emulation ,
+        connect( widget , SIGNAL(mouseSignal(int,int,int,int)) , _terminalEmulation ,
                  SLOT(sendMouseEvent(int,int,int,int)) );
-        connect( widget , SIGNAL(sendStringToEmu(const char *)) , _emulation ,
+        connect( widget , SIGNAL(sendStringToEmu(const char *)) , _terminalEmulation ,
                  SLOT(sendString(const char *)) );
 
         // allow emulation to notify view when the foreground process
         // indicates whether or not it is interested in mouse signals
-        connect( _emulation , SIGNAL(programUsesMouseChanged(bool)) , widget ,
+        connect( _terminalEmulation , SIGNAL(programUsesMouseChanged(bool)) , widget ,
                  SLOT(setUsesMouse(bool)) );
 
-        widget->setUsesMouse( _emulation->programUsesMouse() );
+        widget->setUsesMouse( _terminalEmulation->programUsesMouse() );
 
-        widget->setScreenWindow(_emulation->createWindow());
+        widget->setScreenWindow(_terminalEmulation->createWindow());
     }
 
     //connect view signals and slots
@@ -235,17 +210,17 @@ void TerminalSession::removeView(TerminalDisplay * widget)
 
     disconnect(widget,0,this,0);
 
-    if ( _emulation != 0 ) {
+    if ( _terminalEmulation != 0 ) {
         // disconnect
         //  - key presses signals from widget
         //  - mouse activity signals from widget
         //  - string sending signals from widget
         //
         //  ... and any other signals connected in addView()
-        disconnect( widget, 0, _emulation, 0);
+        disconnect( widget, 0, _terminalEmulation, 0);
 
         // disconnect state change signals emitted by emulation
-        disconnect( _emulation , 0 , widget , 0);
+        disconnect( _terminalEmulation , 0 , widget , 0);
     }
 
     // close the session automatically when the last view is removed
@@ -255,43 +230,13 @@ void TerminalSession::removeView(TerminalDisplay * widget)
 }
 
 void TerminalSession::start() {
-    //check that everything is in place to run the session
-    if (_program.isEmpty()) {
-        qDebug() << "Session::run() - program to run not set.";
-    }
-    else {
-        qDebug() << "Session::run() - program:" << _program;
-    }
-
-    if (_arguments.isEmpty()) {
-        qDebug() << "Session::run() - no command line arguments specified.";
-    }
-    else {
-        qDebug() << "Session::run() - arguments:" << _arguments;
-    }
-
-    // Upon a KPty error, there is no description on what that error was...
-    // Check to see if the given program is executable.
-
-
-    /* ok iam not exactly sure where _program comes from - however it was set to /bin/bash on my system
-     * Thats bad for BSD as its /usr/local/bin/bash there - its also bad for arch as its /usr/bin/bash there too!
-     * So i added a check to see if /bin/bash exists - if no then we use $SHELL - if that does not exist either, we fall back to /bin/sh
-     * As far as i know /bin/sh exists on every unix system.. You could also just put some ifdef __FREEBSD__ here but i think these 2 filechecks are worth
-     * their computing time on any system - especially with the problem on arch linux beeing there too.
-     */
     QString exec = QFile::encodeName(_program);
-    // if 'exec' is not specified, fall back to default shell.  if that
-    // is not set then fall back to /bin/sh
-
-    // here we expect full path. If there is no fullpath let's expect it's
-    // a custom shell (eg. python, etc.) available in the PATH.
-    if (exec.startsWith("/"))
-    {
+    if(exec.startsWith("/")) {
         QFile excheck(exec);
         if ( exec.isEmpty() || !excheck.exists() ) {
             exec = getenv("SHELL");
         }
+
         excheck.setFileName(exec);
 
         if ( exec.isEmpty() || !excheck.exists() ) {
@@ -304,24 +249,18 @@ void TerminalSession::start() {
     QString argsTmp(_arguments.join(" ").trimmed());
     QStringList arguments;
     arguments << exec;
-    if (argsTmp.length())
+    if (argsTmp.length()) {
         arguments << _arguments;
+    }
 
-    QString cwd = QDir::currentPath();
     if (!_initialWorkingDir.isEmpty()) {
         _shellProcess->setWorkingDirectory(_initialWorkingDir);
     } else {
-        _shellProcess->setWorkingDirectory(cwd);
+        _shellProcess->setWorkingDirectory(QDir::currentPath());
     }
 
     _shellProcess->setFlowControlEnabled(_flowControl);
-    _shellProcess->setErase(_emulation->eraseChar());
-
-    // this is not strictly accurate use of the COLORFGBG variable.  This does not
-    // tell the terminal exactly which colors are being used, but instead approximates
-    // the color scheme as "black on white" or "white on black" depending on whether
-    // the background color is deemed dark or not
-    QString backgroundColorHint = _hasDarkBackground ? "COLORFGBG=15;0" : "COLORFGBG=0;15";
+    _shellProcess->setErase(_terminalEmulation->eraseChar());
 
     /* if we do all the checking if this shell exists then we use it ;)
      * Dont know about the arguments though.. maybe youll need some more checking im not sure
@@ -329,7 +268,7 @@ void TerminalSession::start() {
      */
     int result = _shellProcess->start(exec,
                                       arguments,
-                                      _environment << backgroundColorHint,
+                                      _environment,
                                       windowId(),
                                       _addToUtmp);
 
@@ -522,7 +461,7 @@ void TerminalSession::updateTerminalSize()
 
     // backend emulation must have a _terminal of at least 1 column x 1 line in size
     if ( minLines > 0 && minColumns > 0 ) {
-        _emulation->setImageSize( minLines , minColumns );
+        _terminalEmulation->setImageSize( minLines , minColumns );
         _shellProcess->setWindowSize( minLines , minColumns );
     }
 }
@@ -573,12 +512,12 @@ void TerminalSession::close()
 
 void TerminalSession::sendText(QString text) const
 {
-    _emulation->sendText(text);
+    _terminalEmulation->sendText(text);
 }
 
 TerminalSession::~TerminalSession()
 {
-    delete _emulation;
+    delete _terminalEmulation;
     delete _shellProcess;
     //  delete _zmodemProc;
 }
@@ -621,14 +560,14 @@ void TerminalSession::done(int exitStatus)
 
 }
 
-Emulation * TerminalSession::emulation() const
+TerminalEmulation * TerminalSession::emulation() const
 {
-    return _emulation;
+    return _terminalEmulation;
 }
 
 QString TerminalSession::keyBindings() const
 {
-    return _emulation->keyBindings();
+    return _terminalEmulation->keyBindings();
 }
 
 QStringList TerminalSession::environment() const
@@ -648,7 +587,7 @@ int TerminalSession::sessionId() const
 
 void TerminalSession::setKeyBindings(QString id)
 {
-    _emulation->setKeyBindings(id);
+    _terminalEmulation->setKeyBindings(id);
 }
 
 void TerminalSession::setTitle(TitleRole role , QString newTitle)
@@ -701,17 +640,17 @@ QString TerminalSession::iconText() const
 
 void TerminalSession::setHistoryType(const HistoryType & hType)
 {
-    _emulation->setHistory(hType);
+    _terminalEmulation->setHistory(hType);
 }
 
 const HistoryType & TerminalSession::historyType() const
 {
-    return _emulation->history();
+    return _terminalEmulation->history();
 }
 
 void TerminalSession::clearHistory()
 {
-    _emulation->clearHistory();
+    _terminalEmulation->clearHistory();
 }
 
 QStringList TerminalSession::arguments() const
@@ -905,13 +844,13 @@ void Session::zmodemFinished()
 */
 void TerminalSession::onReceiveBlock( const char * buf, int len )
 {
-    _emulation->receiveData( buf, len );
+    _terminalEmulation->receiveData( buf, len );
     emit receivedData( QString::fromLatin1( buf, len ) );
 }
 
 QSize TerminalSession::size()
 {
-    return _emulation->imageSize();
+    return _terminalEmulation->imageSize();
 }
 
 void TerminalSession::setSize(const QSize & size)

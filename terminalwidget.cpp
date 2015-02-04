@@ -28,7 +28,7 @@
 #include "terminalsession.h"
 #include "screen.h"
 #include "screenwindow.h"
-#include "emulation.h"
+#include "terminalemulation.h"
 #include "terminaldisplay.h"
 #include "keyboardtranslator.h"
 #include "colorscheme.h"
@@ -222,7 +222,6 @@ void TerminalWidget::createSession() {
     _terminalSession->setCodec(QTextCodec::codecForName("UTF-8"));
     _terminalSession->setFlowControlEnabled(true);
     _terminalSession->setHistoryType(HistoryTypeBuffer(1000));
-    _terminalSession->setDarkBackground(true);
     _terminalSession->setKeyBindings("");
 }
 

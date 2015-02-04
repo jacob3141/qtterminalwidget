@@ -118,15 +118,13 @@ enum {
  * how long the emulation has been active/idle for and also respond to
  * a 'bell' event in different ways.
  */
-class Emulation : public QObject
-{ 
+class TerminalEmulation : public QObject {
     Q_OBJECT
-
 public:
 
     /** Constructs a new terminal emulation */
-    Emulation();
-    ~Emulation();
+    TerminalEmulation();
+    ~TerminalEmulation();
 
     /**
    * Creates a new window onto the output from this emulation.  The contents

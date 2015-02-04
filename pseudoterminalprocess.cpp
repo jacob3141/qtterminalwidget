@@ -62,7 +62,7 @@ PseudoTerminalProcess::PseudoTerminalProcess(QObject *parent) :
     d->pty->open();
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
-    init();
+    initialize();
 }
 
 PseudoTerminalProcess::PseudoTerminalProcess(int ptyMasterFd, QObject *parent) :
@@ -74,7 +74,7 @@ PseudoTerminalProcess::PseudoTerminalProcess(int ptyMasterFd, QObject *parent) :
     d->pty->open(ptyMasterFd);
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
             SLOT(_k_onStateChanged(QProcess::ProcessState)));
-    init();
+    initialize();
 }
 
 PseudoTerminalProcess::~PseudoTerminalProcess()
@@ -94,8 +94,8 @@ void PseudoTerminalProcess::setWindowSize(int lines, int cols)
     _windowColumns = cols;
     _windowLines = lines;
 
-    if (pty()->masterFd() >= 0)
-        pty()->setWinSize(lines, cols);
+    if (pseudoTerminalDevice()->masterFd() >= 0)
+        pseudoTerminalDevice()->setWinSize(lines, cols);
 }
 
 QSize PseudoTerminalProcess::windowSize() const
@@ -107,25 +107,25 @@ void PseudoTerminalProcess::setFlowControlEnabled(bool enable)
 {
     _xonXoff = enable;
 
-    if (pty()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttmode;
-        pty()->tcGetAttr(&ttmode);
+        pseudoTerminalDevice()->tcGetAttr(&ttmode);
         if (!enable)
             ttmode.c_iflag &= ~(IXOFF | IXON);
         else
             ttmode.c_iflag |= (IXOFF | IXON);
-        if (!pty()->tcSetAttr(&ttmode))
+        if (!pseudoTerminalDevice()->tcSetAttr(&ttmode))
             qWarning() << "Unable to set terminal attributes.";
     }
 }
 
 bool PseudoTerminalProcess::flowControlEnabled() const
 {
-    if (pty()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttmode;
-        pty()->tcGetAttr(&ttmode);
+        pseudoTerminalDevice()->tcGetAttr(&ttmode);
         return ttmode.c_iflag & IXOFF &&
                 ttmode.c_iflag & IXON;
     }
@@ -138,15 +138,15 @@ void PseudoTerminalProcess::setUtf8Mode(bool enable)
 #ifdef IUTF8 // XXX not a reasonable place to check it.
     _utf8 = enable;
 
-    if (pty()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttmode;
-        pty()->tcGetAttr(&ttmode);
+        pseudoTerminalDevice()->tcGetAttr(&ttmode);
         if (!enable)
             ttmode.c_iflag &= ~IUTF8;
         else
             ttmode.c_iflag |= IUTF8;
-        if (!pty()->tcSetAttr(&ttmode))
+        if (!pseudoTerminalDevice()->tcSetAttr(&ttmode))
             qWarning() << "Unable to set terminal attributes.";
     }
 #endif
@@ -156,29 +156,29 @@ void PseudoTerminalProcess::setErase(char erase)
 {
     _eraseChar = erase;
 
-    if (pty()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttmode;
-        pty()->tcGetAttr(&ttmode);
+        pseudoTerminalDevice()->tcGetAttr(&ttmode);
         ttmode.c_cc[VERASE] = erase;
-        if (!pty()->tcSetAttr(&ttmode))
+        if (!pseudoTerminalDevice()->tcSetAttr(&ttmode))
             qWarning() << "Unable to set terminal attributes.";
     }
 }
 
 char PseudoTerminalProcess::erase() const
 {
-    if (pty()->masterFd() >= 0)
+    if (pseudoTerminalDevice()->masterFd() >= 0)
     {
         struct ::termios ttyAttributes;
-        pty()->tcGetAttr(&ttyAttributes);
+        pseudoTerminalDevice()->tcGetAttr(&ttyAttributes);
         return ttyAttributes.c_cc[VERASE];
     }
 
     return _eraseChar;
 }
 
-void PseudoTerminalProcess::addEnvironmentVariables(QStringList environment)
+void PseudoTerminalProcess::appendEnvironmentVariables(QStringList environment)
 {
     QListIterator<QString> iter(environment);
     while (iter.hasNext())
@@ -193,7 +193,7 @@ void PseudoTerminalProcess::addEnvironmentVariables(QStringList environment)
             QString variable = pair.left(pos);
             QString value = pair.mid(pos+1);
 
-            setEnv(variable,value);
+            appendEnvironmentVariable(variable,value);
         }
     }
 }
@@ -216,22 +216,19 @@ int PseudoTerminalProcess::start(QString program,
                QStringList programArguments,
                QStringList environment,
                ulong winid,
-               bool addToUtmp
-               //QString dbusService,
-               //QString dbusSession
-               )
-{
+               bool addToUtmp) {
+    qDebug() << "Starting pseudoterminal process";
     clearProgram();
 
     // For historical reasons, the first argument in programArguments is the
     // name of the program to execute, so create a list consisting of all
     // but the first argument to pass to setProgram()
     Q_ASSERT(programArguments.count() >= 1);
-    setProgram(program.toLatin1(),programArguments.mid(1));
+    setProgram(program.toLatin1(), programArguments.mid(1));
 
-    addEnvironmentVariables(environment);
-
-    setEnv("WINDOWID", QString::number(winid));
+    appendEnvironmentVariables(environment);
+    appendEnvironmentVariable("WINDOWID", QString::number(winid));
+    appendEnvironmentVariable("TERM", "xterm");
 
     // unless the LANGUAGE environment variable has been set explicitly
     // set it to a null string
@@ -244,12 +241,12 @@ int PseudoTerminalProcess::start(QString program,
     // does not have a translation for
     //
     // BR:149300
-    setEnv("LANGUAGE",QString(),false /* do not overwrite existing value if any */);
+    appendEnvironmentVariable("LANGUAGE", QString(), false /* do not overwrite existing value if any */);
 
     setUseUtmp(addToUtmp);
 
     struct ::termios ttmode;
-    pty()->tcGetAttr(&ttmode);
+    pseudoTerminalDevice()->tcGetAttr(&ttmode);
     if (!_xonXoff)
         ttmode.c_iflag &= ~(IXOFF | IXON);
     else
@@ -264,10 +261,10 @@ int PseudoTerminalProcess::start(QString program,
     if (_eraseChar != 0)
         ttmode.c_cc[VERASE] = _eraseChar;
 
-    if (!pty()->tcSetAttr(&ttmode))
+    if (!pseudoTerminalDevice()->tcSetAttr(&ttmode))
         qWarning() << "Unable to set terminal attributes.";
 
-    pty()->setWinSize(_windowLines, _windowColumns);
+    pseudoTerminalDevice()->setWinSize(_windowLines, _windowColumns);
 
     Process::start();
 
@@ -280,14 +277,14 @@ int PseudoTerminalProcess::start(QString program,
 void PseudoTerminalProcess::setWriteable(bool writeable)
 {
     struct stat sbuf;
-    stat(pty()->ttyName(), &sbuf);
+    stat(pseudoTerminalDevice()->ttyName(), &sbuf);
     if (writeable)
-        chmod(pty()->ttyName(), sbuf.st_mode | S_IWGRP);
+        chmod(pseudoTerminalDevice()->ttyName(), sbuf.st_mode | S_IWGRP);
     else
-        chmod(pty()->ttyName(), sbuf.st_mode & ~(S_IWGRP|S_IWOTH));
+        chmod(pseudoTerminalDevice()->ttyName(), sbuf.st_mode & ~(S_IWGRP|S_IWOTH));
 }
 
-void PseudoTerminalProcess::init()
+void PseudoTerminalProcess::initialize()
 {
     _windowColumns = 0;
     _windowLines = 0;
@@ -295,7 +292,7 @@ void PseudoTerminalProcess::init()
     _xonXoff = true;
     _utf8 =true;
 
-    connect(pty(), SIGNAL(readyRead()) , this , SLOT(dataReceived()));
+    connect(pseudoTerminalDevice(), SIGNAL(readyRead()) , this , SLOT(dataReceived()));
     setPseudoTerminalChannels(PseudoTerminalProcess::AllChannels);
 }
 
@@ -304,7 +301,7 @@ void PseudoTerminalProcess::sendData(const char* data, int length)
     if (!length)
         return;
 
-    if (!pty()->write(data,length))
+    if (!pseudoTerminalDevice()->write(data,length))
     {
         qWarning() << "Pty::doSendJobs - Could not send input data to terminal process.";
         return;
@@ -313,7 +310,7 @@ void PseudoTerminalProcess::sendData(const char* data, int length)
 
 void PseudoTerminalProcess::dataReceived()
 {
-    QByteArray data = pty()->readAll();
+    QByteArray data = pseudoTerminalDevice()->readAll();
     emit receivedData(data.constData(),data.count());
 }
 
@@ -330,7 +327,7 @@ void PseudoTerminalProcess::lockPty(bool lock)
 
 int PseudoTerminalProcess::foregroundProcessGroup() const
 {
-    int pid = tcgetpgrp(pty()->masterFd());
+    int pid = tcgetpgrp(pseudoTerminalDevice()->masterFd());
 
     if ( pid != -1 )
     {
@@ -354,7 +351,7 @@ bool PseudoTerminalProcess::isUseUtmp() const
     return d->addUtmp;
 }
 
-PseudoTerminalDevice *PseudoTerminalProcess::pty() const
+PseudoTerminalDevice *PseudoTerminalProcess::pseudoTerminalDevice() const
 {
     Q_D(const PseudoTerminalProcess);
 

@@ -129,7 +129,7 @@ public:
      * @param overwrite if @c false and the environment variable is already
      *   set, the old value will be preserved
      */
-    void setEnv(QString name, QString value, bool overwrite = true);
+    void appendEnvironmentVariable(QString name, QString value, bool overwrite = true);
 
     /**
      * Removes the variable @p name from the process' environment.
@@ -138,7 +138,7 @@ public:
      *
      * @param name the name of the environment variable
      */
-    void unsetEnv(QString name);
+    void removeEnvironmentVariable(QString name);
 
     /**
      * Empties the process' environment.
@@ -200,28 +200,6 @@ public:
      * Clear the program and command line argument list.
      */
     void clearProgram();
-
-    /**
-     * Set a command to execute through a shell (a POSIX sh on *NIX
-     * and cmd.exe on Windows).
-     *
-     * Using this for anything but user-supplied commands is usually a bad
-     * idea, as the command's syntax depends on the platform.
-     * Redirections including pipes, etc. are better handled by the
-     * respective functions provided by QProcess.
-     *
-     * If KProcess determines that the command does not really need a
-     * shell, it will trasparently execute it without one for performance
-     * reasons.
-     *
-     * This function must be called before starting the process, obviously.
-     *
-     * @param cmd the command to execute through a shell.
-     *   The caller must make sure that all filenames etc. are properly
-     *   quoted when passed as argument. Failure to do so often results in
-     *   serious security holes. See KShell::quoteArg().
-     */
-    void setShellCommand(QString cmd);
 
     /**
      * Obtain the currently set program and arguments.

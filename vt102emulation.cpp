@@ -54,7 +54,7 @@ void scrolllock_set_on();
 #include <QByteRef>
 
 Vt102Emulation::Vt102Emulation() 
-    : Emulation(),
+    : TerminalEmulation(),
       _titleUpdateTimer(new QTimer(this))
 {
     _titleUpdateTimer->setSingleShot(true);

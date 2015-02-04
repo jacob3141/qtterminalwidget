@@ -120,12 +120,11 @@ public:
      * @param dbusSession Specifies the value of the KONSOLE_DBUS_SESSION
      * environment variable in the process's environment.
      */
-    int start( QString program,
-               QStringList arguments,
-               QStringList environment,
-               ulong winid,
-               bool addToUtmp
-               );
+    int start(QString program,
+              QStringList arguments,
+              QStringList environment,
+              ulong winid,
+              bool addToUtmp);
 
     /** TODO: Document me */
     void setWriteable(bool writeable);
@@ -174,13 +173,13 @@ public:
      */
     void setPseudoTerminalChannels(PseudoTerminalChannels channels);
 
-    bool isRunning() const
-    {
+    bool isRunning() const {
         bool rval;
         (pid() > 0) ? rval= true : rval= false;
         return rval;
 
     }
+
     /**
      * Query to which channels the PTY is assigned.
      *
@@ -207,13 +206,6 @@ public:
      * @return whether to register in utmp
      */
     bool isUseUtmp() const;
-
-    /**
-     * Get the PTY device of this process.
-     *
-     * @return the PTY device
-     */
-    PseudoTerminalDevice *pty() const;
 
 public slots:
     /**
@@ -252,18 +244,17 @@ signals:
     void receivedData(const char* buffer, int length);
 
 protected:
-    /**
-     * @reimp
-     */
     virtual void setupChildProcess();
 
 private slots:
     void dataReceived();
 
 private:
-    void init();
+    PseudoTerminalDevice *pseudoTerminalDevice() const;
 
-    void addEnvironmentVariables(QStringList environment);
+    void initialize();
+
+    void appendEnvironmentVariables(QStringList environment);
 
     int  _windowColumns;
     int  _windowLines;
@@ -273,11 +264,6 @@ private:
 
     Q_PRIVATE_SLOT(d_func(), void _k_onStateChanged(QProcess::ProcessState))
 };
-
-
-//////////////////
-// private data //
-//////////////////
 
 struct PseudoTerminalProcessPrivate : ProcessPrivate {
     PseudoTerminalProcessPrivate() :

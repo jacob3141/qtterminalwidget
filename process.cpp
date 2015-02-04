@@ -36,7 +36,8 @@
 
 #include "process.h"
 
-#include <qfile.h>
+#include <QFile>
+#include <QDebug>
 
 #ifdef Q_OS_WIN
 # include <windows.h>
@@ -175,8 +176,8 @@ void Process::clearEnvironment()
     setEnvironment(QStringList() << QString::fromLatin1(DUMMYENV));
 }
 
-void Process::setEnv(QString name, QString value, bool overwrite)
-{
+void Process::appendEnvironmentVariable(QString name, QString value, bool overwrite) {
+    qDebug() << "Appending environment variable " << name << "=" << value;
     QStringList env = environment();
     if (env.isEmpty()) {
         env = systemEnvironment();
@@ -196,7 +197,7 @@ void Process::setEnv(QString name, QString value, bool overwrite)
     setEnvironment(env);
 }
 
-void Process::unsetEnv(QString name)
+void Process::removeEnvironmentVariable(QString name)
 {
     QStringList env = environment();
     if (env.isEmpty()) {
@@ -270,73 +271,6 @@ void Process::clearProgram()
 #endif
 }
 
-#if 0
-void KProcess::setShellCommand(QStringcmd)
-{
-    Q_D(KProcess);
-
-    KShell::Errors err;
-    d->args = KShell::splitArgs(
-                cmd, KShell::AbortOnMeta | KShell::TildeExpand, &err);
-    if (err == KShell::NoError && !d->args.isEmpty()) {
-        d->prog = KStandardDirs::findExe(d->args[0]);
-        if (!d->prog.isEmpty()) {
-            d->args.removeFirst();
-#ifdef Q_OS_WIN
-            setNativeArguments(QString());
-#endif
-            return;
-        }
-    }
-
-    d->args.clear();
-
-#ifdef Q_OS_UNIX
-    // #ifdef NON_FREE // ... as they ship non-POSIX /bin/sh
-# if !defined(__linux__) && !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__) && !defined(__DragonFly__) && !defined(__GNU__)
-    // If /bin/sh is a symlink, we can be pretty sure that it points to a
-    // POSIX shell - the original bourne shell is about the only non-POSIX
-    // shell still in use and it is always installed natively as /bin/sh.
-    d->prog = QFile::symLinkTarget(QString::fromLatin1("/bin/sh"));
-    if (d->prog.isEmpty()) {
-        // Try some known POSIX shells.
-        d->prog = KStandardDirs::findExe(QString::fromLatin1("ksh"));
-        if (d->prog.isEmpty()) {
-            d->prog = KStandardDirs::findExe(QString::fromLatin1("ash"));
-            if (d->prog.isEmpty()) {
-                d->prog = KStandardDirs::findExe(QString::fromLatin1("bash"));
-                if (d->prog.isEmpty()) {
-                    d->prog = KStandardDirs::findExe(QString::fromLatin1("zsh"));
-                    if (d->prog.isEmpty())
-                        // We're pretty much screwed, to be honest ...
-                        d->prog = QString::fromLatin1("/bin/sh");
-                }
-            }
-        }
-    }
-# else
-    d->prog = QString::fromLatin1("/bin/sh");
-# endif
-
-    d->args << QString::fromLatin1("-c") << cmd;
-#else // Q_OS_UNIX
-    // KMacroExpander::expandMacrosShellQuote(), KShell::quoteArg() and
-    // KShell::joinArgs() may generate these for security reasons.
-    setEnv(PERCENT_VARIABLE, QLatin1String("%"));
-
-#ifndef _WIN32_WCE
-    WCHAR sysdir[MAX_PATH + 1];
-    UINT size = GetSystemDirectoryW(sysdir, MAX_PATH + 1);
-    d->prog = QString::fromUtf16((const ushort *) sysdir, size);
-    d->prog += QLatin1String("\\cmd.exe");
-    setNativeArguments(QLatin1String("/V:OFF /S /C \"") + cmd + QLatin1Char('"'));
-#else
-    d->prog = QLatin1String("\\windows\\cmd.exe");
-    setNativeArguments(QLatin1String("/S /C \"") + cmd + QLatin1Char('"'));
-#endif
-#endif
-}
-#endif
 QStringList Process::program() const
 {
     Q_D(const Process);

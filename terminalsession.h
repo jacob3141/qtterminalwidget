@@ -33,10 +33,9 @@
 
 // Own includes
 #include "history.h"
-class Process;
-class Emulation;
-class Pty;
+class PseudoTerminalProcess;
 class TerminalDisplay;
+class TerminalEmulation;
 
 // Qt includes
 #include <QStringList>
@@ -125,7 +124,7 @@ public:
      * Returns the terminal emulation instance being used to encode / decode
      * characters to / from the process.
      */
-    Emulation * emulation() const;
+    TerminalEmulation * emulation() const;
 
     /**
      * Returns the environment of this session as a list of strings like
@@ -340,21 +339,6 @@ public:
     void setCodec(QTextCodec * codec);
 
     /**
-     * Sets whether the session has a dark background or not.  The session
-     * uses this information to set the COLORFGBG variable in the process's
-     * environment, which allows the programs running in the terminal to determine
-     * whether the background is light or dark and use appropriate colors by default.
-     *
-     * This has no effect once the session is running.
-     */
-    void setDarkBackground(bool darkBackground);
-    /**
-     * Returns true if the session has a dark background.
-     * See setDarkBackground()
-     */
-    bool hasDarkBackground() const;
-
-    /**
      * Attempts to get the shell program to redraw the current display area.
      * This can be used after clearing the screen, for example, to get the
      * shell to redraw the prompt line.
@@ -477,8 +461,8 @@ private:
 
     int            _uniqueIdentifier;
 
-    Pty     *_shellProcess;
-    Emulation  *  _emulation;
+    PseudoTerminalProcess     *_shellProcess;
+    TerminalEmulation  *  _terminalEmulation;
 
     QList<TerminalDisplay *> _views;
 
@@ -517,8 +501,6 @@ private:
     QColor         _modifiedBackground; // as set by: echo -en '\033]11;Color\007
 
     QString        _profileKey;
-
-    bool _hasDarkBackground;
 
     static int lastSessionId;
 

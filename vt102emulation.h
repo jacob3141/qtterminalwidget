@@ -30,7 +30,7 @@
 #pragma once
 
 // Own includes
-#include "emulation.h"
+#include "terminalemulation.h"
 #include "screen.h"
 
 #define MODE_AppScreen       (MODES_SCREEN+0)   // Mode #1
@@ -73,7 +73,7 @@ struct CharCodes {
  * sequences.
  *
  */
-class Vt102Emulation : public Emulation {
+class Vt102Emulation : public TerminalEmulation {
     Q_OBJECT
 
 public:

@@ -27,7 +27,7 @@
 */
 
 // Own includes
-#include "emulation.h"
+#include "terminalemulation.h"
 #include "keyboardtranslator.h"
 #include "screen.h"
 #include "terminalcharacterdecoder.h"
@@ -49,7 +49,7 @@
 #include <QThread>
 #include <QTime>
 
-Emulation::Emulation() :
+TerminalEmulation::TerminalEmulation() :
     _currentScreen(0),
     _codec(0),
     _decoder(0),
@@ -69,17 +69,17 @@ Emulation::Emulation() :
              SLOT(usesMouseChanged(bool)) );
 }
 
-bool Emulation::programUsesMouse() const
+bool TerminalEmulation::programUsesMouse() const
 {
     return _usesMouse;
 }
 
-void Emulation::usesMouseChanged(bool usesMouse)
+void TerminalEmulation::usesMouseChanged(bool usesMouse)
 {
     _usesMouse = usesMouse;
 }
 
-ScreenWindow* Emulation::createWindow()
+ScreenWindow* TerminalEmulation::createWindow()
 {
     ScreenWindow* window = new ScreenWindow();
     window->setScreen(_currentScreen);
@@ -93,7 +93,7 @@ ScreenWindow* Emulation::createWindow()
     return window;
 }
 
-Emulation::~Emulation()
+TerminalEmulation::~TerminalEmulation()
 {
     QListIterator<ScreenWindow*> windowIter(_windows);
 
@@ -107,7 +107,7 @@ Emulation::~Emulation()
     delete _decoder;
 }
 
-void Emulation::setScreen(int n)
+void TerminalEmulation::setScreen(int n)
 {
     Screen *old = _currentScreen;
     _currentScreen = _screen[n & 1];
@@ -119,23 +119,23 @@ void Emulation::setScreen(int n)
     }
 }
 
-void Emulation::clearHistory()
+void TerminalEmulation::clearHistory()
 {
     _screen[0]->setScroll( _screen[0]->getScroll() , false );
 }
-void Emulation::setHistory(const HistoryType& t)
+void TerminalEmulation::setHistory(const HistoryType& t)
 {
     _screen[0]->setScroll(t);
 
     showBulk();
 }
 
-const HistoryType& Emulation::history() const
+const HistoryType& TerminalEmulation::history() const
 {
     return _screen[0]->getScroll();
 }
 
-void Emulation::setCodec(const QTextCodec * qtc)
+void TerminalEmulation::setCodec(const QTextCodec * qtc)
 {
     if (qtc)
         _codec = qtc;
@@ -148,7 +148,7 @@ void Emulation::setCodec(const QTextCodec * qtc)
     emit useUtf8Request(utf8());
 }
 
-void Emulation::setCodec(EmulationCodec codec)
+void TerminalEmulation::setCodec(EmulationCodec codec)
 {
     if ( codec == Utf8Codec )
         setCodec( QTextCodec::codecForName("utf8") );
@@ -156,7 +156,7 @@ void Emulation::setCodec(EmulationCodec codec)
         setCodec( QTextCodec::codecForLocale() );
 }
 
-void Emulation::setKeyBindings(QString name)
+void TerminalEmulation::setKeyBindings(QString name)
 {
     _keyTranslator = KeyboardTranslatorManager::instance()->findTranslator(name);
     if (!_keyTranslator)
@@ -165,12 +165,12 @@ void Emulation::setKeyBindings(QString name)
     }
 }
 
-QString Emulation::keyBindings() const
+QString TerminalEmulation::keyBindings() const
 {
     return _keyTranslator->name();
 }
 
-void Emulation::receiveChar(int c)
+void TerminalEmulation::receiveChar(int c)
 // process application unicode input to terminal
 // this is a trivial scanner
 {
@@ -187,7 +187,7 @@ void Emulation::receiveChar(int c)
     };
 }
 
-void Emulation::sendKeyEvent( QKeyEvent* ev )
+void TerminalEmulation::sendKeyEvent( QKeyEvent* ev )
 {
     emit stateSet(NOTIFYNORMAL);
 
@@ -199,12 +199,12 @@ void Emulation::sendKeyEvent( QKeyEvent* ev )
     }
 }
 
-void Emulation::sendString(const char*,int)
+void TerminalEmulation::sendString(const char*,int)
 {
     // default implementation does nothing
 }
 
-void Emulation::sendMouseEvent(int /*buttons*/, int /*column*/, int /*row*/, int /*eventType*/)
+void TerminalEmulation::sendMouseEvent(int /*buttons*/, int /*column*/, int /*row*/, int /*eventType*/)
 {
     // default implementation does nothing
 }
@@ -214,7 +214,7 @@ void Emulation::sendMouseEvent(int /*buttons*/, int /*column*/, int /*row*/, int
 TODO: Character composition from the old code.  See #96536
 */
 
-void Emulation::receiveData(const char* text, int length)
+void TerminalEmulation::receiveData(const char* text, int length)
 {
     emit stateSet(NOTIFYACTIVITY);
 
@@ -288,14 +288,14 @@ void Emulation::receiveData(const char* text, int length)
   }
 }*/
 
-void Emulation::writeToStream( TerminalCharacterDecoder* _decoder , 
+void TerminalEmulation::writeToStream( TerminalCharacterDecoder* _decoder ,
                                int startLine ,
                                int endLine)
 {
     _currentScreen->writeLinesToStream(_decoder,startLine,endLine);
 }
 
-int Emulation::lineCount() const
+int TerminalEmulation::lineCount() const
 {
     // sum number of lines currently on _screen plus number of lines in history
     return _currentScreen->getLines() + _currentScreen->getHistLines();
@@ -304,7 +304,7 @@ int Emulation::lineCount() const
 #define BULK_TIMEOUT1 10
 #define BULK_TIMEOUT2 40
 
-void Emulation::showBulk()
+void TerminalEmulation::showBulk()
 {
     _bulkTimer1.stop();
     _bulkTimer2.stop();
@@ -315,7 +315,7 @@ void Emulation::showBulk()
     _currentScreen->resetDroppedLines();
 }
 
-void Emulation::bufferedUpdate()
+void TerminalEmulation::bufferedUpdate()
 {
     _bulkTimer1.setSingleShot(true);
     _bulkTimer1.start(BULK_TIMEOUT1);
@@ -326,12 +326,12 @@ void Emulation::bufferedUpdate()
     }
 }
 
-char Emulation::eraseChar() const
+char TerminalEmulation::eraseChar() const
 {
     return '\b';
 }
 
-void Emulation::setImageSize(int lines, int columns)
+void TerminalEmulation::setImageSize(int lines, int columns)
 {
     if ((lines < 1) || (columns < 1))
         return;
@@ -353,7 +353,7 @@ void Emulation::setImageSize(int lines, int columns)
     bufferedUpdate();
 }
 
-QSize Emulation::imageSize() const
+QSize TerminalEmulation::imageSize() const
 {
     return QSize(_currentScreen->getColumns(), _currentScreen->getLines());
 }

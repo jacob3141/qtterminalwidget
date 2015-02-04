@@ -13,7 +13,6 @@ HEADERS += \
     colorscheme.h \
     colortables.h \
     defaulttranslatortext.h \
-    emulation.h \
     extendeddefaulttranslator.h \
     filter.h \
     history.h \
@@ -31,14 +30,14 @@ HEADERS += \
     process.h \
     ringbuffer.h \
     pseudoterminaldevice.h \
-    pseudoterminalprocess.h
+    pseudoterminalprocess.h \
+    terminalemulation.h
 FORMS += SearchBar.ui
 SOURCES += \
            konsole_wcwidth.cpp \
     terminalwidget.cpp \
     blockarray.cpp \
     colorscheme.cpp \
-    emulation.cpp \
     filter.cpp \
     history.cpp \
     historysearch.cpp \
@@ -53,7 +52,8 @@ SOURCES += \
     terminalsession.cpp \
     process.cpp \
     pseudoterminaldevice.cpp \
-    pseudoterminalprocess.cpp
+    pseudoterminalprocess.cpp \
+    terminalemulation.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc
