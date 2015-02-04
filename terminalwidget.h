@@ -20,7 +20,8 @@
 
 // Own includes
 #include "filter.h"
-struct TermWidgetImpl;
+#include "terminaldisplay.h"
+#include "session.h"
 class SearchBar;
 
 // Qt includes
@@ -218,8 +219,11 @@ private:
     void search(bool forwards, bool next);
     void setZoom(int step);
     void initialize(bool startSession);
+    void createSession();
+    void createTerminalDisplay();
 
-    TermWidgetImpl * m_impl;
-    SearchBar* m_searchBar;
-    QVBoxLayout *m_layout;
+    TerminalDisplay *_terminalDisplay;
+    Session *_session;
+    SearchBar *_searchBar;
+    QVBoxLayout *_layout;
 };
