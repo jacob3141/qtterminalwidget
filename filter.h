@@ -105,7 +105,7 @@ public:
         * one of the object names from the actions() list.  In which case the associated
         * action should be performed.
         */
-        virtual void activate(const QString& action = QString()) = 0;
+        virtual void activate(QString action = QString()) = 0;
         /**
         * Returns a list of actions associated with the hotspot which can be used in a
         * menu or toolbar
@@ -147,7 +147,7 @@ public:
     void reset();
 
     /** Adds a new line of text to the filter and increments the line count */
-    //void addLine(const QString& string);
+    //void addLine(QString string);
 
     /** Returns the hotspot which covers the given @p line and @p column, or 0 if no hotspot covers that area */
     HotSpot* hotSpotAt(int line , int column) const;
@@ -197,10 +197,10 @@ public:
     {
     public:
         HotSpot(int startLine, int startColumn, int endLine , int endColumn);
-        virtual void activate(const QString& action = QString());
+        virtual void activate(QString action = QString());
 
         /** Sets the captured texts associated with this hotspot */
-        void setCapturedTexts(const QStringList& texts);
+        void setCapturedTexts(QStringList texts);
         /** Returns the texts found by the filter when matching the filter's regular expression */
         QStringList capturedTexts() const;
     private:
@@ -265,7 +265,7 @@ public:
          * Open a web browser at the current URL.  The url itself can be determined using
          * the capturedTexts() method.
          */
-        virtual void activate(const QString& action = QString());
+        virtual void activate(QString action = QString());
 
         virtual QString tooltip() const;
     private:

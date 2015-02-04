@@ -28,7 +28,6 @@
 
 // Own includes
 #include "pty.h"
-#include "kpty.h"
 #include "kptydevice.h"
 
 // System includes
@@ -130,7 +129,7 @@ char Pty::erase() const
     return _eraseChar;
 }
 
-void Pty::addEnvironmentVariables(const QStringList& environment)
+void Pty::addEnvironmentVariables(QStringList environment)
 {
     QListIterator<QString> iter(environment);
     while (iter.hasNext())
@@ -150,13 +149,13 @@ void Pty::addEnvironmentVariables(const QStringList& environment)
     }
 }
 
-int Pty::start(const QString& program, 
-               const QStringList& programArguments,
-               const QStringList& environment,
+int Pty::start(QString program,
+               QStringList programArguments,
+               QStringList environment,
                ulong winid,
                bool addToUtmp
-               //const QString& dbusService,
-               //const QString& dbusSession
+               //QString dbusService,
+               //QString dbusSession
                )
 {
     clearProgram();
@@ -207,7 +206,7 @@ int Pty::start(const QString& program,
 
     pty()->setWinSize(_windowLines, _windowColumns);
 
-    KProcess::start();
+    Process::start();
 
     if (!waitForStarted())
         return -1;

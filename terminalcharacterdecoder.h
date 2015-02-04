@@ -130,7 +130,7 @@ public:
     virtual void end();
 
 private:
-    void openSpan(QString& text , const QString& style);
+    void openSpan(QString& text , QString style);
     void closeSpan(QString& text);
 
     QTextStream* _output;

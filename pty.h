@@ -94,9 +94,9 @@ public:
      * @param dbusSession Specifies the value of the KONSOLE_DBUS_SESSION
      * environment variable in the process's environment.
      */
-    int start( const QString& program,
-               const QStringList& arguments,
-               const QStringList& environment,
+    int start( QString program,
+               QStringList arguments,
+               QStringList environment,
                ulong winid,
                bool addToUtmp
                );
@@ -184,7 +184,7 @@ private slots:
 private:
     void init();
 
-    void addEnvironmentVariables(const QStringList& environment);
+    void addEnvironmentVariables(QStringList environment);
 
     int  _windowColumns;
     int  _windowLines;

@@ -29,14 +29,14 @@
 
 
 #include "kptyprocess.h"
-#include "kprocess.h"
+#include "process.h"
 #include "kptydevice.h"
 
 #include <stdlib.h>
 #include <unistd.h>
 
 KPtyProcess::KPtyProcess(QObject *parent) :
-    KProcess(new KPtyProcessPrivate, parent)
+    Process(new KPtyProcessPrivate, parent)
 {
     Q_D(KPtyProcess);
 
@@ -47,7 +47,7 @@ KPtyProcess::KPtyProcess(QObject *parent) :
 }
 
 KPtyProcess::KPtyProcess(int ptyMasterFd, QObject *parent) :
-    KProcess(new KPtyProcessPrivate, parent)
+    Process(new KPtyProcessPrivate, parent)
 {
     Q_D(KPtyProcess);
 
@@ -123,7 +123,11 @@ void KPtyProcess::setupChildProcess()
     if (d->ptyChannels & StderrChannel)
         dup2(d->pty->slaveFd(), 2);
 
-    KProcess::setupChildProcess();
+    Process::setupChildProcess();
 }
 
+void KPtyProcessPrivate::_k_onStateChanged(QProcess::ProcessState newState) {
+    if (newState == QProcess::NotRunning && addUtmp)
+        pty->logout();
+}
 //#include "kptyprocess.moc"

@@ -29,7 +29,7 @@
 // function copied from kdelibs/kio/kio/kurlcompletion.cpp
 static bool expandEnv(QString & text);
 
-ShellCommand::ShellCommand(const QString & fullCommand)
+ShellCommand::ShellCommand(QString fullCommand)
 {
     bool inQuotes = false;
 
@@ -55,7 +55,7 @@ ShellCommand::ShellCommand(const QString & fullCommand)
         }
     }
 }
-ShellCommand::ShellCommand(const QString & command , const QStringList & arguments)
+ShellCommand::ShellCommand(QString command , QStringList  arguments)
 {
     _arguments = arguments;
 
@@ -89,7 +89,7 @@ bool ShellCommand::isAvailable() const
     Q_ASSERT(0); // not implemented yet
     return false;
 }
-QStringList ShellCommand::expand(const QStringList & items)
+QStringList ShellCommand::expand(QStringList  items)
 {
     QStringList result;
 
@@ -98,7 +98,7 @@ QStringList ShellCommand::expand(const QStringList & items)
 
     return result;
 }
-QString ShellCommand::expand(const QString & text)
+QString ShellCommand::expand(QString text)
 {
     QString result = text;
     expandEnv(result);

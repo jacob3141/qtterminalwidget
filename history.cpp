@@ -208,7 +208,7 @@ bool HistoryScroll::hasScroll()
    at 0 in cells.
 */
 
-HistoryScrollFile::HistoryScrollFile(const QString &logFileName)
+HistoryScrollFile::HistoryScrollFile(QString logFileName)
     : HistoryScroll(new HistoryTypeFile(logFileName)),
       m_logFileName(logFileName)
 {
@@ -897,7 +897,7 @@ HistoryScroll* HistoryTypeBuffer::scroll(HistoryScroll *old) const
 
 //////////////////////////////
 
-HistoryTypeFile::HistoryTypeFile(const QString& fileName)
+HistoryTypeFile::HistoryTypeFile(QString fileName)
     : m_fileName(fileName)
 {
 }
@@ -907,7 +907,7 @@ bool HistoryTypeFile::isEnabled() const
     return true;
 }
 
-const QString& HistoryTypeFile::getFileName() const
+QString HistoryTypeFile::getFileName() const
 {
     return m_fileName;
 }

@@ -141,7 +141,7 @@ int konsole_wcwidth(quint16 ucs) {
 }
 
 // single byte char: +1, multi byte char: +2
-int string_width( const QString & txt )
+int string_width( QString txt )
 {
     int w = 0;
     for ( int i = 0; i < txt.length(); ++i ) {

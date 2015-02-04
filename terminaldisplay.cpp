@@ -180,7 +180,7 @@ void TerminalDisplay::setColorTable(const ColorEntry table[])
 */
 
 static inline bool isLineChar(quint16 c) { return ((c & 0xFF80) == 0x2500);}
-static inline bool isLineCharString(const QString& string)
+static inline bool isLineCharString(QString string)
 {
     return (string.length() > 0) && (isLineChar(string.at(0).unicode()));
 }
@@ -511,7 +511,7 @@ static void drawLineChar(QPainter& paint, int x, int y, int w, int h, uchar code
 
 }
 
-void TerminalDisplay::drawLineCharString(    QPainter& painter, int x, int y, const QString& str, 
+void TerminalDisplay::drawLineCharString(    QPainter& painter, int x, int y, QString str,
                                              const Character* attributes)
 {
     const QPen& currentPen = painter.pen();
@@ -662,7 +662,7 @@ void TerminalDisplay::drawCursor(QPainter& painter,
 
 void TerminalDisplay::drawCharacters(QPainter& painter,
                                      const QRect& rect,
-                                     const QString& text,
+                                     QString text,
                                      const Character* style,
                                      bool invertCharacterColor)
 {
@@ -722,7 +722,7 @@ void TerminalDisplay::drawCharacters(QPainter& painter,
 
 void TerminalDisplay::drawTextFragment(QPainter& painter , 
                                        const QRect& rect,
-                                       const QString& text,
+                                       QString text,
                                        const Character* style)
 {
     painter.save();
@@ -1832,7 +1832,7 @@ void TerminalDisplay::mouseMoveEvent(QMouseEvent* ev)
         }
         // display tooltips when mousing over links
         // TODO: Extend this to work with filter types other than links
-        const QString& tooltip = spot->tooltip();
+        QString tooltip = spot->tooltip();
         if ( !tooltip.isEmpty() )
         {
             QToolTip::showText( mapToGlobal(ev->pos()) , tooltip , this , _mouseOverHotspotArea.boundingRect() );
@@ -2425,7 +2425,7 @@ QChar TerminalDisplay::charClass(QChar qch) const
     return qch;
 }
 
-void TerminalDisplay::setWordCharacters(const QString& wc)
+void TerminalDisplay::setWordCharacters(QString wc)
 {
     _wordCharacters = wc;
 }
@@ -2471,13 +2471,11 @@ void TerminalDisplay::emitSelection(bool useXselection,bool appendReturn)
     }
 }
 
-void TerminalDisplay::setSelection(const QString& t)
-{
-    QApplication::clipboard()->setText(t, QClipboard::Selection);
+void TerminalDisplay::setSelection(QString selection) {
+    QApplication::clipboard()->setText(selection, QClipboard::Selection);
 }
 
-void TerminalDisplay::copyClipboard()
-{
+void TerminalDisplay::copyClipboard() {
     if ( !_screenWindow )
         return;
 
@@ -2736,7 +2734,7 @@ void TerminalDisplay::enableBell()
     _allowBell = true;
 }
 
-void TerminalDisplay::bell(const QString& message)
+void TerminalDisplay::bell(QString message)
 {
     if (_bellMode==NoBell) return;
 

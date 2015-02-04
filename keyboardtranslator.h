@@ -252,7 +252,7 @@ public:
     };
 
     /** Constructs a new keyboard translator with the given @p name */
-    KeyboardTranslator(const QString& name);
+    KeyboardTranslator(QString name);
 
     //KeyboardTranslator(const KeyboardTranslator& other);
 
@@ -260,13 +260,13 @@ public:
     QString name() const;
 
     /** Sets the name of this keyboard translator */
-    void setName(const QString& name);
+    void setName(QString name);
 
     /** Returns the descriptive name of this keyboard translator */
     QString description() const;
 
     /** Sets the descriptive name of this keyboard translator */
-    void setDescription(const QString& description);
+    void setDescription(QString description);
 
     /**
      * Looks for an entry in this keyboard translator which matches the given
@@ -371,8 +371,8 @@ public:
      *
      * The condition and result strings are in the same format as in
      */
-    static KeyboardTranslator::Entry createEntry( const QString& condition ,
-                                                  const QString& result );
+    static KeyboardTranslator::Entry createEntry( QString condition ,
+                                                  QString result );
 private:
     struct Token
     {
@@ -388,19 +388,19 @@ private:
         Type type;
         QString text;
     };
-    QList<Token> tokenize(const QString&);
+    QList<Token> tokenize(QString);
     void readNext();
-    bool decodeSequence(const QString& ,
+    bool decodeSequence(QString ,
                         int& keyCode,
                         Qt::KeyboardModifiers& modifiers,
                         Qt::KeyboardModifiers& modifierMask,
                         KeyboardTranslator::States& state,
                         KeyboardTranslator::States& stateFlags);
 
-    static bool parseAsModifier(const QString& item , Qt::KeyboardModifier& modifier);
-    static bool parseAsStateFlag(const QString& item , KeyboardTranslator::State& state);
-    static bool parseAsKeyCode(const QString& item , int& keyCode);
-    static bool parseAsCommand(const QString& text , KeyboardTranslator::Command& command);
+    static bool parseAsModifier(QString item , Qt::KeyboardModifier& modifier);
+    static bool parseAsStateFlag(QString item , KeyboardTranslator::State& state);
+    static bool parseAsKeyCode(QString item , int& keyCode);
+    static bool parseAsCommand(QString text , KeyboardTranslator::Command& command);
 
     QIODevice* _source;
     QString _description;
@@ -423,7 +423,7 @@ public:
      * Writes the header for the keyboard translator.
      * @param description Description of the keyboard translator.
      */
-    void writeHeader( const QString& description );
+    void writeHeader( QString description );
     /** Writes a translator entry. */
     void writeEntry( const KeyboardTranslator::Entry& entry );
 
@@ -462,7 +462,7 @@ public:
      *
      * TODO: More documentation
      */
-    bool deleteTranslator(const QString& name);
+    bool deleteTranslator(QString name);
 
     /** Returns the default translator for Konsole. */
     const KeyboardTranslator* defaultTranslator();
@@ -474,7 +474,7 @@ public:
      * The first time that a translator with a particular name is requested,
      * the on-disk .keyboard file is loaded and parsed.
      */
-    const KeyboardTranslator* findTranslator(const QString& name);
+    const KeyboardTranslator* findTranslator(QString name);
     /**
      * Returns a list of the names of available keyboard translators.
      *
@@ -490,12 +490,12 @@ private:
     static const QByteArray defaultTranslatorText;
     
     void findTranslators(); // locate the available translators
-    KeyboardTranslator* loadTranslator(const QString& name); // loads the translator
+    KeyboardTranslator* loadTranslator(QString name); // loads the translator
     // with the given name
-    KeyboardTranslator* loadTranslator(QIODevice* device,const QString& name);
+    KeyboardTranslator* loadTranslator(QIODevice* device,QString name);
 
     bool saveTranslator(const KeyboardTranslator* translator);
-    QString findTranslatorPath(const QString& name);
+    QString findTranslatorPath(QString name);
     
     QHash<QString,KeyboardTranslator*> _translators; // maps translator-name -> KeyboardTranslator
     // instance

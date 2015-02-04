@@ -123,7 +123,7 @@ protected:
 class HistoryScrollFile : public HistoryScroll
 {
 public:
-    HistoryScrollFile(const QString &logFileName);
+    HistoryScrollFile(QString logFileName);
     virtual ~HistoryScrollFile();
 
     virtual int  getLines();
@@ -402,10 +402,10 @@ protected:
 
 class HistoryTypeFile : public HistoryType {
 public:
-    HistoryTypeFile(const QString& fileName=QString());
+    HistoryTypeFile(QString fileName=QString());
 
     virtual bool isEnabled() const;
-    virtual const QString& getFileName() const;
+    virtual QString getFileName() const;
     virtual int maximumLineCount() const;
 
     virtual HistoryScroll* scroll(HistoryScroll *) const;

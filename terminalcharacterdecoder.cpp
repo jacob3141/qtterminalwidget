@@ -229,7 +229,7 @@ void HTMLDecoder::decodeLine(const Character* const characters, int count, LineP
     
     *_output << text;
 }
-void HTMLDecoder::openSpan(QString& text , const QString& style)
+void HTMLDecoder::openSpan(QString& text , QString style)
 {
     text.append( QString("<span style=\"%1\">").arg(style) );
 }

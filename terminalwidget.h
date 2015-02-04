@@ -21,7 +21,7 @@
 // Own includes
 #include "filter.h"
 #include "terminaldisplay.h"
-#include "session.h"
+#include "terminalsession.h"
 class SearchBar;
 
 // Qt includes
@@ -60,7 +60,7 @@ public:
     int shellPid();
 
     /** TODO: document. */
-    void changeDir(const QString& dir);
+    void changeDir(QString dir);
 
     /**
      * Sets the terminal font. Please be aware that you are only allowed
@@ -79,16 +79,16 @@ public:
      * Sets a set of environment variables.
      * @param environment The environment variables.
      */
-    void setEnvironment(const QStringList& environment);
+    void setEnvironment(QStringList environment);
 
     /** Set the shell program. Defaults to /bin/bash. */
-    void setShellProgram(const QString& shellProgram);
+    void setShellProgram(QString shellProgram);
 
     /** Shell program arguments. Default to none. */
-    void setShellProgramArguments(const QStringList& arguments);
+    void setShellProgramArguments(QStringList arguments);
 
     /** Sets the current working directory. */
-    void setWorkingDirectory(const QString& dir);
+    void setWorkingDirectory(QString dir);
 
     QString workingDirectory();
 
@@ -100,7 +100,7 @@ public:
      * @param[in] name The name of the color scheme, either returned from
      * availableColorSchemes() or a full path to a color scheme.
      */
-    void setColorScheme(const QString& name);
+    void setColorScheme(QString name);
 
     /** @returns a list of available color schemes. */
     static QStringList availableColorSchemes();
@@ -118,7 +118,7 @@ public:
     void scrollToEnd();
 
     /** Pastes text into the terminal (as if it was typed in). */
-    void pasteText(const QString& text);
+    void pasteText(QString text);
 
     /** Sets whether flow control is enabled. */
     void setFlowControlEnabled(bool enabled);
@@ -188,7 +188,7 @@ signals:
 
     void urlActivated(const QUrl&);
 
-    void bell(const QString& message);
+    void bell(QString message);
 
     void activity();
     void silence();
@@ -208,7 +208,7 @@ public slots:
     void zoomOut();
     
     /** Set named key binding for given widget. */
-    void setKeyBindings(const QString & kb);
+    void setKeyBindings(QString kb);
 
     /** Clear the terminal content and move to home position. */
     void clear();
@@ -238,7 +238,7 @@ private:
     void createTerminalDisplay();
 
     TerminalDisplay *_terminalDisplay;
-    Session *_session;
+    TerminalSession *_terminalSession;
     SearchBar *_searchBar;
     QVBoxLayout *_layout;
 };

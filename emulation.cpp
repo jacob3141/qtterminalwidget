@@ -149,7 +149,7 @@ void Emulation::setCodec(EmulationCodec codec)
         setCodec( QTextCodec::codecForLocale() );
 }
 
-void Emulation::setKeyBindings(const QString& name)
+void Emulation::setKeyBindings(QString name)
 {
     _keyTranslator = KeyboardTranslatorManager::instance()->findTranslator(name);
     if (!_keyTranslator)

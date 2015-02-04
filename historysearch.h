@@ -20,7 +20,7 @@
 #pragma once
 
 // Own includes
-#include "session.h"
+#include "terminalsession.h"
 #include "screenwindow.h"
 #include "emulation.h"
 #include "terminalcharacterdecoder.h"

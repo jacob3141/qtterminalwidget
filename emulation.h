@@ -185,7 +185,7 @@ public:
    * ( received through sendKeyEvent() ) into character
    * streams to send to the terminal.
    */
-    void setKeyBindings(const QString& name);
+    void setKeyBindings(QString name);
     /**
    * Returns the name of the emulation's current key bindings.
    * See setKeyBindings()
@@ -218,7 +218,7 @@ public slots:
    * Interprets a sequence of characters and sends the result to the terminal.
    * This is equivalent to calling sendKeyEvent() for each character in @p text in succession.
    */
-    virtual void sendText(const QString& text) = 0;
+    virtual void sendText(QString text) = 0;
 
     /**
    * Interprets a key press event and emits the sendData() signal with
@@ -362,7 +362,7 @@ signals:
    * @param newTitle Specifies the new title
    */
 
-    void titleChanged(int title,const QString& newTitle);
+    void titleChanged(int title,QString newTitle);
 
     /**
    * Emitted when the program running in the terminal changes the
@@ -381,7 +381,7 @@ signals:
    * @param text A string expected to contain a series of key and value pairs in
    * the form:  name=value;name2=value2 ...
    */
-    void profileChangeCommandReceived(const QString& text);
+    void profileChangeCommandReceived(QString text);
 
     /**
    * Emitted when a flow control key combination ( Ctrl+S or Ctrl+Q ) is pressed.

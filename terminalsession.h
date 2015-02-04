@@ -26,7 +26,7 @@
 
 // Own includes
 #include "history.h"
-class KProcess;
+class Process;
 class Emulation;
 class Pty;
 class TerminalDisplay;
@@ -46,7 +46,7 @@ class TerminalDisplay;
  * or send input to the program in the terminal in the form of keypresses and mouse
  * activity.
  */
-class Session : public QObject {
+class TerminalSession : public QObject {
     Q_OBJECT
 
 public:
@@ -66,8 +66,8 @@ public:
      * falls back to using the program specified in the SHELL environment
      * variable.
      */
-    Session(QObject* parent = 0);
-    virtual ~Session();
+    TerminalSession(QObject* parent = 0);
+    virtual ~TerminalSession();
 
     /**
      * Returns true if the session is currently running.  This will be true
@@ -81,7 +81,7 @@ public:
      * @param profileKey A key which can be used to obtain the current
      * profile settings from the SessionManager
      */
-    void setProfileKey(const QString & profileKey);
+    void setProfileKey(QString profileKey);
     /**
      * Returns the profile key associated with this session.
      * This can be passed to the SessionManager to obtain the current
@@ -130,7 +130,7 @@ public:
      * @p environment should be a list of strings like
      * VARIABLE=VALUE
      */
-    void setEnvironment(const QStringList & environment);
+    void setEnvironment(QStringList  environment);
 
     /** Returns the unique ID for this session. */
     int sessionId() const;
@@ -163,7 +163,7 @@ public:
      * followed by a letter.  (eg. %d for directory).  The dynamic
      * elements available depend on the @p context
      */
-    void setTabTitleFormat(TabTitleContext context , const QString & format);
+    void setTabTitleFormat(TabTitleContext context , QString format);
     /** Returns the format used by this session for tab titles. */
     QString tabTitleFormat(TabTitleContext context) const;
 
@@ -177,9 +177,9 @@ public:
      * Sets the command line arguments which the session's program will be passed when
      * run() is called.
      */
-    void setArguments(const QStringList & arguments);
+    void setArguments(QStringList  arguments);
     /** Sets the program to be executed when run() is called. */
-    void setProgram(const QString & program);
+    void setProgram(QString program);
 
     /** Returns the session's current working directory. */
     QString initialWorkingDirectory() {
@@ -190,7 +190,7 @@ public:
      * Sets the initial working directory for the session when it is run
      * This has no effect once the session has been started.
      */
-    void setInitialWorkingDirectory( const QString & dir );
+    void setInitialWorkingDirectory( QString dir );
 
     /**
      * Sets the type of history store used by this session.
@@ -245,7 +245,7 @@ public:
      * names of available key bindings can be determined using the
      * KeyboardTranslatorManager class.
      */
-    void setKeyBindings(const QString & id);
+    void setKeyBindings(QString id);
     /** Returns the name of the key bindings used by this session. */
     QString keyBindings() const;
 
@@ -260,21 +260,21 @@ public:
     };
 
     /** Sets the session's title for the specified @p role to @p title. */
-    void setTitle(TitleRole role , const QString & title);
+    void setTitle(TitleRole role , QString title);
     /** Returns the session's title for the specified @p role. */
     QString title(TitleRole role) const;
     /** Convenience method used to read the name property.  Returns title(Session::NameRole). */
     QString nameTitle() const {
-        return title(Session::NameRole);
+        return title(TerminalSession::NameRole);
     }
 
     /** Sets the name of the icon associated with this session. */
-    void setIconName(const QString & iconName);
+    void setIconName(QString iconName);
     /** Returns the name of the icon associated with this session. */
     QString iconName() const;
 
     /** Sets the text of the icon associated with this session. */
-    void setIconText(const QString & iconText);
+    void setIconText(QString iconText);
     /** Returns the text of the icon associated with this session. */
     QString iconText() const;
 
@@ -304,7 +304,7 @@ public:
     /**
      * Sends @p text to the current foreground terminal program.
      */
-    void sendText(const QString & text) const;
+    void sendText(QString text) const;
 
     /**
      * Returns the process id of the terminal process.
@@ -355,13 +355,12 @@ public:
     void refresh();
 
 public slots:
-
     /**
      * Starts the terminal session.
      *
      * This creates the terminal process and connects the teletype to it.
      */
-    void run();
+    void start();
 
     /**
      * Closes the terminal session.  This sends a hangup signal
@@ -375,7 +374,7 @@ public slots:
      * emulation display. For a list of what may be changed see the
      * Emulation::titleChanged() signal.
      */
-    void setUserTitle( int, const QString & caption );
+    void setUserTitle(int, QString caption);
 
 signals:
 
@@ -390,13 +389,13 @@ signals:
     /**
      * Emitted when output is received from the terminal process.
      */
-    void receivedData( const QString & text );
+    void receivedData( QString text );
 
     /** Emitted when the session's title has changed. */
     void titleChanged();
 
     /** Emitted when the session's profile has changed. */
-    void profileChanged(const QString & profile);
+    void profileChanged(QString profile);
 
     /**
      * Emitted when the activity state of this session changes.
@@ -407,7 +406,7 @@ signals:
     void stateChanged(int state);
 
     /** Emitted when a bell event occurs in the session. */
-    void bellRequest( const QString & message );
+    void bellRequest( QString message );
 
     /**
      * Requests that the color the text for any tabs associated with
@@ -424,7 +423,7 @@ signals:
     void changeBackgroundColorRequest(const QColor &);
 
     /** TODO: Document me. */
-    void openUrlRequest(const QString & url);
+    void openUrlRequest(QString url);
 
     /**
      * Emitted when the terminal process requests a change
@@ -440,7 +439,7 @@ signals:
      * @param text The text of the command.  This is a string of the form
      * "PropertyName=Value;PropertyName=Value ..."
      */
-    void profileChangeCommandReceived(const QString & text);
+    void profileChangeCommandReceived(QString text);
 
     /**
      * Emitted when the flow control state changes.
@@ -534,12 +533,12 @@ public:
     ~SessionGroup();
 
     /** Adds a session to the group. */
-    void addSession( Session * session );
+    void addSession( TerminalSession * session );
     /** Removes a session from the group. */
-    void removeSession( Session * session );
+    void removeSession( TerminalSession * session );
 
     /** Returns the list of sessions currently in the group. */
-    QList<Session *> sessions() const;
+    QList<TerminalSession *> sessions() const;
 
     /**
      * Sets whether a particular session is a master within the group.
@@ -549,9 +548,9 @@ public:
      * @param session The session whoose master status should be changed.
      * @param master True to make this session a master or false otherwise
      */
-    void setMasterStatus( Session * session , bool master );
+    void setMasterStatus( TerminalSession * session , bool master );
     /** Returns the master status of a session.  See setMasterStatus() */
-    bool masterStatus( Session * session ) const;
+    bool masterStatus( TerminalSession * session ) const;
 
     /**
      * This enum describes the options for propagating certain activity or
@@ -579,13 +578,13 @@ public:
     int masterMode() const;
 
 private:
-    void connectPair(Session * master , Session * other);
-    void disconnectPair(Session * master , Session * other);
+    void connectPair(TerminalSession * master , TerminalSession * other);
+    void disconnectPair(TerminalSession * master , TerminalSession * other);
     void connectAll(bool connect);
-    QList<Session *> masters() const;
+    QList<TerminalSession *> masters() const;
 
     /** maps sessions to their master status */
-    QHash<Session *,bool> _sessions;
+    QHash<TerminalSession *,bool> _sessions;
 
     int _masterMode;
 };

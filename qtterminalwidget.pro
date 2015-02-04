@@ -2,12 +2,10 @@ QT += widgets
 
 TEMPLATE = lib
 TARGET = qtterminalwidget
+CONFIG += staticlib
 
 HEADERS += \
            konsole_wcwidth.h \
-           kprocess.h \
-           kpty.h \
-           kpty_p.h \
            kptydevice.h \
            kptyprocess.h \
     terminalwidget.h \
@@ -27,17 +25,16 @@ HEADERS += \
     pty.h \
     screen.h \
     searchbar.h \
-    session.h \
     shellcommand.h \
     terminalcharacterdecoder.h \
     terminaldisplay.h \
     vt102emulation.h \
-    screenwindow.h
+    screenwindow.h \
+    terminalsession.h \
+    process.h
 FORMS += SearchBar.ui
 SOURCES += \
            konsole_wcwidth.cpp \
-           kprocess.cpp \
-           kpty.cpp \
            kptydevice.cpp \
            kptyprocess.cpp \
     terminalwidget.cpp \
@@ -52,11 +49,12 @@ SOURCES += \
     screen.cpp \
     screenwindow.cpp \
     searchbar.cpp \
-    session.cpp \
     shellcommand.cpp \
     terminalcharacterdecoder.cpp \
     terminaldisplay.cpp \
-    vt102emulation.cpp
+    vt102emulation.cpp \
+    terminalsession.cpp \
+    process.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc

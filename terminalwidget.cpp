@@ -18,7 +18,7 @@
 
 // Own includes
 #include "colortables.h"
-#include "session.h"
+#include "terminalsession.h"
 #include "screen.h"
 #include "screenwindow.h"
 #include "emulation.h"
@@ -73,7 +73,7 @@ void TerminalWidget::search(bool forwards, bool next) {
     regExp.setCaseSensitivity(_searchBar->matchCase() ? Qt::CaseSensitive : Qt::CaseInsensitive);
 
     HistorySearch *historySearch =
-            new HistorySearch(_session->emulation(), regExp, forwards, startColumn, startLine, this);
+            new HistorySearch(_terminalSession->emulation(), regExp, forwards, startColumn, startLine, this);
     connect(historySearch, SIGNAL(matchFound(int, int, int, int)), this, SLOT(matchFound(int, int, int, int)));
     connect(historySearch, SIGNAL(noMatchFound()), this, SLOT(noMatchFound()));
     connect(historySearch, SIGNAL(noMatchFound()), _searchBar, SLOT(noMatchFound()));
@@ -95,10 +95,10 @@ void TerminalWidget::noMatchFound() {
 }
 
 int TerminalWidget::shellPid() {
-    return _session->processId();
+    return _terminalSession->processId();
 }
 
-void TerminalWidget::changeDir(const QString & dir) {
+void TerminalWidget::changeDir(QString dir) {
     /*
        this is a very hackish way of trying to determine if the shell is in
        the foreground before attempting to change the directory.  It may not
@@ -123,11 +123,11 @@ QSize TerminalWidget::sizeHint() const {
 }
 
 void TerminalWidget::startShellProgram() {
-    if ( _session->isRunning() ) {
+    if ( _terminalSession->isRunning() ) {
         return;
     }
 
-    _session->run();
+    _terminalSession->start();
 }
 
 void TerminalWidget::initialize(bool startSession) {
@@ -141,11 +141,11 @@ void TerminalWidget::initialize(bool startSession) {
 
     _layout->addWidget(_terminalDisplay);
 
-    connect(_session, SIGNAL(bellRequest(QString)), _terminalDisplay, SLOT(bell(QString)));
+    connect(_terminalSession, SIGNAL(bellRequest(QString)), _terminalDisplay, SLOT(bell(QString)));
     connect(_terminalDisplay, SIGNAL(notifyBell(QString)), this, SIGNAL(bell(QString)));
 
-    connect(_session, SIGNAL(activity()), this, SIGNAL(activity()));
-    connect(_session, SIGNAL(silence()), this, SIGNAL(silence()));
+    connect(_terminalSession, SIGNAL(activity()), this, SIGNAL(activity()));
+    connect(_terminalSession, SIGNAL(silence()), this, SIGNAL(silence()));
 
     // That's OK, FilterChain's dtor takes care of UrlFilter.
     UrlFilter *urlFilter = new UrlFilter();
@@ -160,8 +160,8 @@ void TerminalWidget::initialize(bool startSession) {
     _layout->addWidget(_searchBar);
     _searchBar->hide();
 
-    if (startSession && _session) {
-        _session->run();
+    if (startSession && _terminalSession) {
+        _terminalSession->start();
     }
 
     this->setFocus( Qt::OtherFocusReason );
@@ -188,16 +188,16 @@ void TerminalWidget::initialize(bool startSession) {
 
     setScrollBarPosition(NoScrollBar);
 
-    _session->addView(_terminalDisplay);
+    _terminalSession->addView(_terminalDisplay);
 
-    connect(_session, SIGNAL(finished()), this, SLOT(sessionFinished()));
+    connect(_terminalSession, SIGNAL(finished()), this, SLOT(sessionFinished()));
 
     setColorScheme("WhiteOnBlack");
 }
 
 void TerminalWidget::createSession() {
-    _session = new Session(this);
-    _session->setTitle(Session::NameRole, "TerminalWidget");
+    _terminalSession = new TerminalSession(this);
+    _terminalSession->setTitle(TerminalSession::NameRole, "TerminalWidget");
 
     /* Thats a freaking bad idea!!!!
      * /bin/bash is not there on every system
@@ -207,16 +207,16 @@ void TerminalWidget::createSession() {
      * But as iam not sure if you want to do anything else ill just let both checks in and set this to $SHELL anyway.
      */
     //_session->setProgram("/bin/bash");
-    _session->setProgram(getenv("SHELL"));
+    _terminalSession->setProgram(getenv("SHELL"));
 
     QStringList args("");
-    _session->setArguments(args);
-    _session->setAutoClose(true);
-    _session->setCodec(QTextCodec::codecForName("UTF-8"));
-    _session->setFlowControlEnabled(true);
-    _session->setHistoryType(HistoryTypeBuffer(1000));
-    _session->setDarkBackground(true);
-    _session->setKeyBindings("");
+    _terminalSession->setArguments(args);
+    _terminalSession->setAutoClose(true);
+    _terminalSession->setCodec(QTextCodec::codecForName("UTF-8"));
+    _terminalSession->setFlowControlEnabled(true);
+    _terminalSession->setHistoryType(HistoryTypeBuffer(1000));
+    _terminalSession->setDarkBackground(true);
+    _terminalSession->setKeyBindings("");
 }
 
 void TerminalWidget::createTerminalDisplay() {
@@ -225,7 +225,7 @@ void TerminalWidget::createTerminalDisplay() {
     _terminalDisplay->setTerminalSizeHint(true);
     _terminalDisplay->setTripleClickMode(TerminalDisplay::SelectWholeLine);
     _terminalDisplay->setTerminalSizeStartup(true);
-    _terminalDisplay->setRandomSeed(_session->sessionId() * 31);
+    _terminalDisplay->setRandomSeed(_terminalSession->sessionId() * 31);
 }
 
 TerminalWidget::~TerminalWidget() {
@@ -251,20 +251,20 @@ void TerminalWidget::setTerminalOpacity(qreal level) {
     _terminalDisplay->setOpacity(level);
 }
 
-void TerminalWidget::setShellProgram(const QString &shellProgram) {
-    if (!_session)
+void TerminalWidget::setShellProgram(QString shellProgram) {
+    if (!_terminalSession)
         return;
-    _session->setProgram(shellProgram);
+    _terminalSession->setProgram(shellProgram);
 }
 
-void TerminalWidget::setWorkingDirectory(const QString& dir) {
-    if (!_session)
+void TerminalWidget::setWorkingDirectory(QString dir) {
+    if (!_terminalSession)
         return;
-    _session->setInitialWorkingDirectory(dir);
+    _terminalSession->setInitialWorkingDirectory(dir);
 }
 
 QString TerminalWidget::workingDirectory() {
-    if (!_session)
+    if (!_terminalSession)
         return QString();
 
 #ifdef Q_OS_LINUX
@@ -282,26 +282,26 @@ QString TerminalWidget::workingDirectory() {
 
 fallback:
     // fallback, initial WD
-    return _session->initialWorkingDirectory();
+    return _terminalSession->initialWorkingDirectory();
 }
 
-void TerminalWidget::setShellProgramArguments(const QStringList &arguments) {
-    if (!_session)
+void TerminalWidget::setShellProgramArguments(QStringList arguments) {
+    if (!_terminalSession)
         return;
-    _session->setArguments(arguments);
+    _terminalSession->setArguments(arguments);
 }
 
 void TerminalWidget::setTextCodec(QTextCodec *codec) {
-    if (!_session)
+    if (!_terminalSession)
         return;
-    _session->setCodec(codec);
+    _terminalSession->setCodec(codec);
 }
 
-void TerminalWidget::setColorScheme(const QString& origName) {
+void TerminalWidget::setColorScheme(QString origName) {
     const ColorScheme *cs = 0;
 
     const bool isFile = QFile::exists(origName);
-    const QString& name = isFile ?
+    QString name = isFile ?
                 QFileInfo(origName).baseName() :
                 origName;
 
@@ -348,9 +348,9 @@ void TerminalWidget::setSize(int h, int v) {
 
 void TerminalWidget::setHistorySize(int lines) {
     if (lines < 0)
-        _session->setHistoryType(HistoryTypeFile());
+        _terminalSession->setHistoryType(HistoryTypeFile());
     else
-        _session->setHistoryType(HistoryTypeBuffer(lines));
+        _terminalSession->setHistoryType(HistoryTypeBuffer(lines));
 }
 
 void TerminalWidget::setScrollBarPosition(ScrollBarPosition pos) {
@@ -365,8 +365,8 @@ void TerminalWidget::scrollToEnd() {
     _terminalDisplay->scrollToEnd();
 }
 
-void TerminalWidget::pasteText(const QString &text) {
-    _session->sendText(text);
+void TerminalWidget::pasteText(QString text) {
+    _terminalSession->sendText(text);
 }
 
 void TerminalWidget::resizeEvent(QResizeEvent*) {
@@ -407,18 +407,18 @@ void TerminalWidget::zoomOut() {
     setZoom(-STEP_ZOOM);
 }
 
-void TerminalWidget::setKeyBindings(const QString & kb) {
-    _session->setKeyBindings(kb);
+void TerminalWidget::setKeyBindings(QString kb) {
+    _terminalSession->setKeyBindings(kb);
 }
 
 void TerminalWidget::clear() {
-    _session->emulation()->reset();
-    _session->refresh();
-    _session->clearHistory();
+    _terminalSession->emulation()->reset();
+    _terminalSession->refresh();
+    _terminalSession->clearHistory();
 }
 
 void TerminalWidget::setFlowControlEnabled(bool enabled) {
-    _session->setFlowControlEnabled(enabled);
+    _terminalSession->setFlowControlEnabled(enabled);
 }
 
 QStringList TerminalWidget::availableKeyBindings() {
@@ -426,7 +426,7 @@ QStringList TerminalWidget::availableKeyBindings() {
 }
 
 QString TerminalWidget::keyBindings() {
-    return _session->keyBindings();
+    return _terminalSession->keyBindings();
 }
 
 void TerminalWidget::toggleShowSearchBar() {
@@ -434,7 +434,7 @@ void TerminalWidget::toggleShowSearchBar() {
 }
 
 bool TerminalWidget::flowControlEnabled(void) {
-    return _session->flowControlEnabled();
+    return _terminalSession->flowControlEnabled();
 }
 
 void TerminalWidget::setFlowControlWarningEnabled(bool enabled) {
@@ -444,8 +444,8 @@ void TerminalWidget::setFlowControlWarningEnabled(bool enabled) {
     }
 }
 
-void TerminalWidget::setEnvironment(const QStringList& environment) {
-    _session->setEnvironment(environment);
+void TerminalWidget::setEnvironment(QStringList environment) {
+    _terminalSession->setEnvironment(environment);
 }
 
 void TerminalWidget::setMotionAfterPasting(int action) {
@@ -481,15 +481,15 @@ QString TerminalWidget::selectedText(bool preserveLineBreaks) {
 }
 
 void TerminalWidget::setMonitorActivity(bool monitor) {
-    _session->setMonitorActivity(monitor);
+    _terminalSession->setMonitorActivity(monitor);
 }
 
 void TerminalWidget::setMonitorSilence(bool monitor) {
-    _session->setMonitorSilence(monitor);
+    _terminalSession->setMonitorSilence(monitor);
 }
 
 void TerminalWidget::setSilenceTimeout(int seconds) {
-    _session->setMonitorSilenceSeconds(seconds);
+    _terminalSession->setMonitorSilenceSeconds(seconds);
 }
 
 Filter::HotSpot* TerminalWidget::hotSpotAt(const QPoint &pos) const {

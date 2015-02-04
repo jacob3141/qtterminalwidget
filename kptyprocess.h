@@ -29,12 +29,10 @@
 
 #pragma once
 
-#include "kprocess.h"
-#include "kptydevice.h"
+#include "process.h"
+class KPtyDevice;
 
 #include <signal.h>
-
-class KPtyDevice;
 
 struct KPtyProcessPrivate;
 
@@ -53,7 +51,7 @@ struct KPtyProcessPrivate;
  *
  * @author Oswald Buddenhagen <ossi@kde.org>
  */
-class KPtyProcess : public KProcess
+class KPtyProcess : public Process
 {
     Q_OBJECT
     Q_DECLARE_PRIVATE(KPtyProcess)
@@ -154,18 +152,14 @@ private:
 // private data //
 //////////////////
 
-struct KPtyProcessPrivate : KProcessPrivate {
+struct KPtyProcessPrivate : ProcessPrivate {
     KPtyProcessPrivate() :
         ptyChannels(KPtyProcess::NoChannels),
         addUtmp(false)
     {
     }
 
-    void _k_onStateChanged(QProcess::ProcessState newState)
-    {
-        if (newState == QProcess::NotRunning && addUtmp)
-            pty->logout();
-    }
+    void _k_onStateChanged(QProcess::ProcessState newState);
 
     KPtyDevice *pty;
     KPtyProcess::PtyChannels ptyChannels;

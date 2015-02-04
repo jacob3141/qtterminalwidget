@@ -30,7 +30,7 @@
 #pragma once
 
 // Own includes
-class KProcessPrivate;
+class ProcessPrivate;
 
 // Qt includes
 #include <QProcess>
@@ -48,9 +48,9 @@ class KProcessPrivate;
  *
  * @author Oswald Buddenhagen <ossi@kde.org>
  **/
-class KProcess : public QProcess {
+class Process : public QProcess {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(KProcess)
+    Q_DECLARE_PRIVATE(Process)
 
 public:
     /**
@@ -74,12 +74,12 @@ public:
     /**
      * Constructor
      */
-    explicit KProcess(QObject *parent = 0);
+    explicit Process(QObject *parent = 0);
 
     /**
      * Destructor
      */
-    virtual ~KProcess();
+    virtual ~Process();
 
     /**
      * Set how to handle the output channels of the child process.
@@ -122,7 +122,7 @@ public:
      * @param overwrite if @c false and the environment variable is already
      *   set, the old value will be preserved
      */
-    void setEnv(const QString &name, const QString &value, bool overwrite = true);
+    void setEnv(QString name, QString value, bool overwrite = true);
 
     /**
      * Removes the variable @p name from the process' environment.
@@ -131,7 +131,7 @@ public:
      *
      * @param name the name of the environment variable
      */
-    void unsetEnv(const QString &name);
+    void unsetEnv(QString name);
 
     /**
      * Empties the process' environment.
@@ -152,7 +152,7 @@ public:
      * @param args the command line arguments for the program,
      *   one per list element
      */
-    void setProgram(const QString &exe, const QStringList &args = QStringList());
+    void setProgram(QString exe, QStringList args = QStringList());
 
     /**
      * @overload
@@ -160,7 +160,7 @@ public:
      * @param argv the program to execute and the command line arguments
      *   for the program, one per list element
      */
-    void setProgram(const QStringList &argv);
+    void setProgram(QStringList argv);
 
     /**
      * Append an element to the command line argument list for this process.
@@ -179,7 +179,7 @@ public:
      * @param arg the argument to add
      * @return a reference to this KProcess
      */
-    KProcess &operator<<(const QString& arg);
+    Process &operator<<(QString arg);
 
     /**
      * @overload
@@ -187,7 +187,7 @@ public:
      * @param args the arguments to add
      * @return a reference to this KProcess
      */
-    KProcess &operator<<(const QStringList& args);
+    Process &operator<<(QStringList args);
 
     /**
      * Clear the program and command line argument list.
@@ -214,7 +214,7 @@ public:
      *   quoted when passed as argument. Failure to do so often results in
      *   serious security holes. See KShell::quoteArg().
      */
-    void setShellCommand(const QString &cmd);
+    void setShellCommand(QString cmd);
 
     /**
      * Obtain the currently set program and arguments.
@@ -227,7 +227,7 @@ public:
     /**
      * Start the process.
      *
-     * @see QProcess::start(const QString &, const QStringList &, OpenMode)
+     * @see QProcess::start(QString, QStringList , OpenMode)
      */
     void start();
 
@@ -260,7 +260,7 @@ public:
      * @return -2 if the process could not be started, -1 if it crashed,
      *  otherwise its exit code
      */
-    static int execute(const QString &exe, const QStringList &args = QStringList(), int msecs = -1);
+    static int execute(QString exe, QStringList args = QStringList(), int msecs = -1);
 
     /**
      * @overload
@@ -271,7 +271,7 @@ public:
      * @return -2 if the process could not be started, -1 if it crashed,
      *  otherwise its exit code
      */
-    static int execute(const QStringList &argv, int msecs = -1);
+    static int execute(QStringList argv, int msecs = -1);
 
     /**
      * Start the process and detach from it. See QProcess::startDetached()
@@ -297,7 +297,7 @@ public:
      *   one per list element
      * @return the PID of the started process or 0 on error
      */
-    static int startDetached(const QString &exe, const QStringList &args = QStringList());
+    static int startDetached(QString exe, QStringList args = QStringList());
 
     /**
      * @overload
@@ -306,7 +306,7 @@ public:
      *   for the program, one per list element
      * @return the PID of the started process or 0 on error
      */
-    static int startDetached(const QStringList &argv);
+    static int startDetached(QStringList argv);
 
     /**
      * Obtain the process' ID as known to the system.
@@ -324,12 +324,12 @@ protected:
     /**
      * @internal
      */
-    KProcess(KProcessPrivate *d, QObject *parent);
+    Process(ProcessPrivate *d, QObject *parent);
 
     /**
      * @internal
      */
-    KProcessPrivate * const d_ptr;
+    ProcessPrivate * const d_ptr;
 
 private:
     using QProcess::setReadChannelMode;
@@ -341,23 +341,23 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _k_forwardStderr())
 };
 
-class KProcessPrivate {
-    Q_DECLARE_PUBLIC(KProcess)
+class ProcessPrivate {
+    Q_DECLARE_PUBLIC(Process)
 
 protected:
-    KProcessPrivate() :
+    ProcessPrivate() :
         openMode(QIODevice::ReadWrite)
     {
     }
     void writeAll(const QByteArray &buf, int fd);
-    void forwardStd(KProcess::ProcessChannel good, int fd);
+    void forwardStd(Process::ProcessChannel good, int fd);
     void _k_forwardStdout();
     void _k_forwardStderr();
 
     QString prog;
     QStringList args;
-    KProcess::OutputChannelMode outputChannelMode;
+    Process::OutputChannelMode outputChannelMode;
     QIODevice::OpenMode openMode;
 
-    KProcess *q_ptr;
+    Process *q_ptr;
 };

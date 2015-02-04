@@ -871,7 +871,7 @@ void Vt102Emulation::sendMouseEvent( int cb, int cx, int cy , int eventType )
     sendString(command);
 }
 
-void Vt102Emulation::sendText( const QString& text )
+void Vt102Emulation::sendText( QString text )
 {
     if (!text.isEmpty())
     {

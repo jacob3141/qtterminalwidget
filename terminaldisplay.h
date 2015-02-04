@@ -287,7 +287,7 @@ public:
      * @param wc An array of characters which are to be considered parts
      * of a word ( in addition to letters and numbers ).
      */
-    void setWordCharacters(const QString& wc);
+    void setWordCharacters(QString wc);
     /**
      * Returns the characters which are considered part of a word for the
      * purpose of selecting words in the display with the mouse.
@@ -332,7 +332,7 @@ public:
         NoBell=3
     };
 
-    void setSelection(const QString &t);
+    void setSelection(QString selection);
 
     /**
      * Reimplemented.  Has no effect.  Use setVTFont() to change the font
@@ -496,7 +496,7 @@ public slots:
      * Shows a notification that a bell event has occurred in the terminal.
      * TODO: More documentation here
      */
-    void bell(const QString& message);
+    void bell(QString message);
 
     /**
      * Sets the background of the display to the specified color.
@@ -557,7 +557,7 @@ signals:
     void termGetFocus();
     void termLostFocus();
 
-    void notifyBell(const QString&);
+    void notifyBell(QString);
     void usesMouseChanged();
 
 protected:
@@ -636,7 +636,7 @@ private:
     // draws a section of text, all the text in this section
     // has a common color and style
     void drawTextFragment(QPainter& painter, const QRect& rect,
-                          const QString& text, const Character* style);
+                          QString text, const Character* style);
     // draws the background for a text fragment
     // if useOpacitySetting is true then the color's alpha value will be set to
     // the display's transparency (set with setOpacity()), otherwise the background
@@ -647,11 +647,11 @@ private:
     void drawCursor(QPainter& painter, const QRect& rect , const QColor& foregroundColor,
                     const QColor& backgroundColor , bool& invertColors);
     // draws the characters or line graphics in a text fragment
-    void drawCharacters(QPainter& painter, const QRect& rect,  const QString& text,
+    void drawCharacters(QPainter& painter, const QRect& rect,  QString text,
                         const Character* style, bool invertCharacterColor);
     // draws a string of line graphics
     void drawLineCharString(QPainter& painter, int x, int y,
-                            const QString& str, const Character* attributes);
+                            QString str, const Character* attributes);
 
     // draws the preedit string for input methods
     void drawInputMethodPreeditString(QPainter& painter , const QRect& rect);

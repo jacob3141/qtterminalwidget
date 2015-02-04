@@ -142,10 +142,10 @@ ColorScheme::~ColorScheme() {
     delete[] _randomTable;
 }
 
-void ColorScheme::setDescription(const QString& description) { _description = description; }
+void ColorScheme::setDescription(QString description) { _description = description; }
 QString ColorScheme::description() const { return _description; }
 
-void ColorScheme::setName(const QString& name) { _name = name; }
+void ColorScheme::setName(QString name) { _name = name; }
 QString ColorScheme::name() const { return _name; }
 
 void ColorScheme::setColorTableEntry(int index , const ColorEntry& entry) {
@@ -255,7 +255,7 @@ bool ColorScheme::hasDarkBackground() const {
 void ColorScheme::setOpacity(qreal opacity) { _opacity = opacity; }
 qreal ColorScheme::opacity() const { return _opacity; }
 
-void ColorScheme::read(const QString & fileName) {
+void ColorScheme::read(QString fileName) {
     QSettings s(fileName, QSettings::IniFormat);
     s.beginGroup("General");
 
@@ -425,7 +425,7 @@ ColorScheme* KDE3ColorSchemeReader::read()
     return scheme;
 }
 
-bool KDE3ColorSchemeReader::readColorLine(const QString& line,ColorScheme* scheme) {
+bool KDE3ColorSchemeReader::readColorLine(QString line,ColorScheme* scheme) {
     QStringList list = line.split(QChar(' '));
 
     if (list.count() != 7)
@@ -458,7 +458,7 @@ bool KDE3ColorSchemeReader::readColorLine(const QString& line,ColorScheme* schem
     scheme->setColorTableEntry(index,entry);
     return true;
 }
-bool KDE3ColorSchemeReader::readTitleLine(const QString& line,ColorScheme* scheme) {
+bool KDE3ColorSchemeReader::readTitleLine(QString line,ColorScheme* scheme) {
     if( !line.startsWith(QLatin1String("title")) )
         return false;
 
@@ -525,7 +525,7 @@ QList<const ColorScheme*> ColorSchemeManager::allColorSchemes()
 
     return _colorSchemes.values();
 }
-bool ColorSchemeManager::loadKDE3ColorScheme(const QString& filePath)
+bool ColorSchemeManager::loadKDE3ColorScheme(QString filePath)
 {
     QFile file(filePath);
     if (!filePath.endsWith(QLatin1String(".schema")) || !file.open(QIODevice::ReadOnly))
@@ -557,7 +557,7 @@ bool ColorSchemeManager::loadKDE3ColorScheme(const QString& filePath)
     return true;
 }
 
-bool ColorSchemeManager::loadCustomColorScheme(const QString& path) {
+bool ColorSchemeManager::loadCustomColorScheme(QString path) {
     if (path.endsWith(QLatin1String(".colorscheme")))
         return loadColorScheme(path);
     else if (path.endsWith(QLatin1String(".schema")))
@@ -566,13 +566,13 @@ bool ColorSchemeManager::loadCustomColorScheme(const QString& path) {
         return false;
 }
 
-bool ColorSchemeManager::loadColorScheme(const QString& filePath) {
+bool ColorSchemeManager::loadColorScheme(QString filePath) {
     if ( !filePath.endsWith(QLatin1String(".colorscheme")) || !QFile::exists(filePath) )
         return false;
 
     QFileInfo info(filePath);
 
-    const QString& schemeName = info.baseName();
+    QString schemeName = info.baseName();
     
     ColorScheme* scheme = new ColorScheme();
     scheme->setName(schemeName);
@@ -631,7 +631,7 @@ const ColorScheme* ColorSchemeManager::defaultColorScheme() const {
     return &_defaultColorScheme;
 }
 
-bool ColorSchemeManager::deleteColorScheme(const QString& name) {
+bool ColorSchemeManager::deleteColorScheme(QString name) {
     Q_ASSERT( _colorSchemes.contains(name) );
 
     // lookup the path and delete
@@ -647,7 +647,7 @@ bool ColorSchemeManager::deleteColorScheme(const QString& name) {
         return false;
     }
 }
-QString ColorSchemeManager::findColorSchemePath(const QString& name) const {
+QString ColorSchemeManager::findColorSchemePath(QString name) const {
     QString path(":/" + name + ".colorscheme");
     if ( !path.isEmpty() )
         return path;
@@ -657,7 +657,7 @@ QString ColorSchemeManager::findColorSchemePath(const QString& name) const {
     return path;
 }
 
-const ColorScheme* ColorSchemeManager::findColorScheme(const QString& name)  {
+const ColorScheme* ColorSchemeManager::findColorScheme(QString name)  {
     if ( name.isEmpty() )
         return defaultColorScheme();
 

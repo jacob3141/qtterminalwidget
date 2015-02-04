@@ -221,7 +221,7 @@ void Filter::getLineColumn(int position , int& startLine , int& startColumn)
 }
 
 
-/*void Filter::addLine(const QString& text)
+/*void Filter::addLine(QString text)
 {
     _linePositions << _buffer.length();
     _buffer.append(text);
@@ -322,11 +322,11 @@ RegExpFilter::HotSpot::HotSpot(int startLine,int startColumn,int endLine,int end
     setType(Marker);
 }
 
-void RegExpFilter::HotSpot::activate(const QString&)
+void RegExpFilter::HotSpot::activate(QString)
 {
 }
 
-void RegExpFilter::HotSpot::setCapturedTexts(const QStringList& texts)
+void RegExpFilter::HotSpot::setCapturedTexts(QStringList texts)
 {
     _capturedTexts = texts;
 }
@@ -435,7 +435,7 @@ UrlFilter::HotSpot::UrlType UrlFilter::HotSpot::urlType() const
         return Unknown;
 }
 
-void UrlFilter::HotSpot::activate(const QString& actionName)
+void UrlFilter::HotSpot::activate(QString actionName)
 {
     QString url = capturedTexts().first();
 

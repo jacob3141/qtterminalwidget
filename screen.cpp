@@ -677,7 +677,7 @@ void Screen::displayCharacter(unsigned short c)
     cuX = newCursorX;
 }
 
-void Screen::compose(const QString& /*compose*/)
+void Screen::compose(QString /*compose*/)
 {
     Q_ASSERT( 0 /*Not implemented yet*/ );
 

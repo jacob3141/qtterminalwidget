@@ -50,16 +50,16 @@ public:
     ~ColorScheme();
 
     /** Sets the descriptive name of the color scheme. */
-    void setDescription(const QString& description);
+    void setDescription(QString description);
     /** Returns the descriptive name of the color scheme. */
     QString description() const;
 
     /** Sets the name of the color scheme */
-    void setName(const QString& name);
+    void setName(QString name);
     /** Returns the name of the color scheme */
     QString name() const;
 
-    void read(const QString & filename);
+    void read(QString filename);
 
     /** Sets a single entry within the color palette. */
     void setColorTableEntry(int index , const ColorEntry& entry);
@@ -224,8 +224,8 @@ public:
 private:
     // reads a line from the file specifying a colour palette entry
     // format is: color [index] [red] [green] [blue] [transparent] [bold]
-    bool readColorLine(const QString& line , ColorScheme* scheme);
-    bool readTitleLine(const QString& line , ColorScheme* scheme);
+    bool readColorLine(QString line , ColorScheme* scheme);
+    bool readTitleLine(QString line , ColorScheme* scheme);
 
     QIODevice* _device;
 };
@@ -264,12 +264,12 @@ public:
      * The first time that a color scheme with a particular name is
      * requested, the configuration information is loaded from disk.
      */
-    const ColorScheme* findColorScheme(const QString& name);
+    const ColorScheme* findColorScheme(QString name);
 
     /**
      * Deletes a color scheme.  Returns true on successful deletion or false otherwise.
      */
-    bool deleteColorScheme(const QString& name);
+    bool deleteColorScheme(QString name);
 
     /**
      * Returns a list of the all the available color schemes.
@@ -295,12 +295,12 @@ public:
      * @param[in] path The path to KDE 4 .colorscheme or KDE 3 .schema.
      * @return Whether the color scheme is loaded successfully.
      */
-    bool loadCustomColorScheme(const QString& path);
+    bool loadCustomColorScheme(QString path);
 private:
     // loads a color scheme from a KDE 4+ .colorscheme file
-    bool loadColorScheme(const QString& path);
+    bool loadColorScheme(QString path);
     // loads a color scheme from a KDE 3 .schema file
-    bool loadKDE3ColorScheme(const QString& path);
+    bool loadKDE3ColorScheme(QString path);
     // returns a list of paths of color schemes in the KDE 4+ .colorscheme file format
     QList<QString> listColorSchemes();
     // returns a list of paths of color schemes in the .schema file format
@@ -309,7 +309,7 @@ private:
     // loads all of the color schemes
     void loadAllColorSchemes();
     // finds the path of a color scheme
-    QString findColorSchemePath(const QString& name) const;
+    QString findColorSchemePath(QString name) const;
 
     QHash<QString,const ColorScheme*> _colorSchemes;
     QSet<ColorScheme*> _modifiedSchemes;
