@@ -1,5 +1,8 @@
+
+// Own includes
 #include "tools.h"
 
+// Qt includes
 #include <QCoreApplication>
 #include <QDir>
 #include <QtDebug>

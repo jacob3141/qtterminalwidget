@@ -18,12 +18,14 @@
 
 #pragma once
 
-#include <QWidget>
-#include "Filter.h"
-
-class QVBoxLayout;
+// Own includes
+#include "filter.h"
 struct TermWidgetImpl;
 class SearchBar;
+
+// Qt includes
+#include <QWidget>
+class QVBoxLayout;
 class QUrl;
 
 class TerminalWidget : public QWidget {

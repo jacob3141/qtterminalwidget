@@ -3,60 +3,62 @@ QT += widgets
 TEMPLATE = lib
 TARGET = qtterminalwidget
 
-HEADERS += BlockArray.h \
-           Character.h \
-           CharacterColor.h \
-           ColorScheme.h \
-           ColorTables.h \
-           DefaultTranslatorText.h \
-           Emulation.h \
-           ExtendedDefaultTranslator.h \
-           Filter.h \
-           History.h \
-           HistorySearch.h \
-           KeyboardTranslator.h \
+HEADERS += \
            konsole_wcwidth.h \
            kprocess.h \
            kpty.h \
            kpty_p.h \
            kptydevice.h \
            kptyprocess.h \
-           LineFont.h \
-           Pty.h \
-           Screen.h \
-           ScreenWindow.h \
-           SearchBar.h \
-           Session.h \
-           ShellCommand.h \
-           TerminalCharacterDecoder.h \
-           TerminalDisplay.h \
            tools.h \
-           Vt102Emulation.h \
-    terminalwidget.h
+    terminalwidget.h \
+    blockarray.h \
+    character.h \
+    charactercolor.h \
+    colorscheme.h \
+    colortables.h \
+    defaulttranslatortext.h \
+    emulation.h \
+    extendeddefaulttranslator.h \
+    filter.h \
+    history.h \
+    historysearch.h \
+    keyboardtranslator.h \
+    linefont.h \
+    pty.h \
+    screen.h \
+    searchbar.h \
+    session.h \
+    shellcommand.h \
+    terminalcharacterdecoder.h \
+    terminaldisplay.h \
+    vt102emulation.h \
+    screenwindow.h
 FORMS += SearchBar.ui
-SOURCES += BlockArray.cpp \
-           ColorScheme.cpp \
-           Emulation.cpp \
-           Filter.cpp \
-           History.cpp \
-           HistorySearch.cpp \
-           KeyboardTranslator.cpp \
+SOURCES += \
            konsole_wcwidth.cpp \
            kprocess.cpp \
            kpty.cpp \
            kptydevice.cpp \
            kptyprocess.cpp \
-           Pty.cpp \
-           Screen.cpp \
-           ScreenWindow.cpp \
-           SearchBar.cpp \
-           Session.cpp \
-           ShellCommand.cpp \
-           TerminalCharacterDecoder.cpp \
-           TerminalDisplay.cpp \
            tools.cpp \
-           Vt102Emulation.cpp \
-    terminalwidget.cpp
+    terminalwidget.cpp \
+    blockarray.cpp \
+    colorscheme.cpp \
+    emulation.cpp \
+    filter.cpp \
+    history.cpp \
+    historysearch.cpp \
+    keyboardtranslator.cpp \
+    pty.cpp \
+    screen.cpp \
+    screenwindow.cpp \
+    searchbar.cpp \
+    session.cpp \
+    shellcommand.cpp \
+    terminalcharacterdecoder.cpp \
+    terminaldisplay.cpp \
+    vt102emulation.cpp
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc

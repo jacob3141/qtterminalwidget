@@ -16,26 +16,26 @@
     Boston, MA 02110-1301, USA.
 */
 
+// Own includes
+#include "colortables.h"
+#include "session.h"
+#include "screen.h"
+#include "screenwindow.h"
+#include "emulation.h"
+#include "terminaldisplay.h"
+#include "keyboardtranslator.h"
+#include "colorscheme.h"
+#include "searchbar.h"
+#include "terminalwidget.h"
+
+// Qt includes
 #include <QLayout>
 #include <QBoxLayout>
 #include <QtDebug>
 #include <QDir>
 #include <QMessageBox>
 
-#include "ColorTables.h"
-#include "Session.h"
-#include "Screen.h"
-#include "ScreenWindow.h"
-#include "Emulation.h"
-#include "TerminalDisplay.h"
-#include "KeyboardTranslator.h"
-#include "ColorScheme.h"
-#include "SearchBar.h"
-#include "terminalwidget.h"
-
 #define STEP_ZOOM 1
-
-
 
 void *createTermWidget(int startnow, void *parent)
 {
