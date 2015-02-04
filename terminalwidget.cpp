@@ -152,15 +152,15 @@ void TerminalWidget::search(bool forwards, bool next)
     {
         m_impl->m_terminalDisplay->screenWindow()->screen()->getSelectionStart(startColumn, startLine);
     }
-   
+
     qDebug() << "current selection starts at: " << startColumn << startLine;
-    qDebug() << "current cursor position: " << m_impl->m_terminalDisplay->screenWindow()->cursorPosition(); 
+    qDebug() << "current cursor position: " << m_impl->m_terminalDisplay->screenWindow()->cursorPosition();
 
     QRegExp regExp(m_searchBar->searchText());
     regExp.setPatternSyntax(m_searchBar->useRegularExpression() ? QRegExp::RegExp : QRegExp::FixedString);
     regExp.setCaseSensitivity(m_searchBar->matchCase() ? Qt::CaseSensitive : Qt::CaseInsensitive);
 
-    HistorySearch *historySearch = 
+    HistorySearch *historySearch =
             new HistorySearch(m_impl->m_session->emulation(), regExp, forwards, startColumn, startLine, this);
     connect(historySearch, SIGNAL(matchFound(int, int, int, int)), this, SLOT(matchFound(int, int, int, int)));
     connect(historySearch, SIGNAL(noMatchFound()), this, SLOT(noMatchFound()));
@@ -182,7 +182,7 @@ void TerminalWidget::matchFound(int startColumn, int startLine, int endColumn, i
 
 void TerminalWidget::noMatchFound()
 {
-        m_impl->m_terminalDisplay->screenWindow()->clearSelection();
+    m_impl->m_terminalDisplay->screenWindow()->clearSelection();
 }
 
 int TerminalWidget::getShellPID()
@@ -271,7 +271,7 @@ void TerminalWidget::init(int startnow)
             this, SIGNAL(termLostFocus()));
     connect(m_impl->m_terminalDisplay, SIGNAL(keyPressedSignal(QKeyEvent *)),
             this, SIGNAL(termKeyPressed(QKeyEvent *)));
-//    m_impl->m_terminalDisplay->setSize(80, 40);
+    //    m_impl->m_terminalDisplay->setSize(80, 40);
 
     QFont font = QApplication::font();
     font.setFamily("Monospace");
@@ -344,7 +344,7 @@ QString TerminalWidget::workingDirectory()
     if (!d.exists())
     {
         qDebug() << "Cannot find" << d.dirName();
-        goto fallback; 
+        goto fallback;
     }
     return d.canonicalPath();
 #endif
@@ -374,8 +374,8 @@ void TerminalWidget::setColorScheme(const QString& origName)
 
     const bool isFile = QFile::exists(origName);
     const QString& name = isFile ?
-            QFileInfo(origName).baseName() :
-            origName;
+                QFileInfo(origName).baseName() :
+                origName;
 
     // avoid legacy (int) solution
     if (!availableColorSchemes().contains(name))
@@ -386,8 +386,8 @@ void TerminalWidget::setColorScheme(const QString& origName)
                 cs = ColorSchemeManager::instance()->findColorScheme(name);
             else
                 qWarning () << Q_FUNC_INFO
-                        << "cannot load color scheme from"
-                        << origName;
+                            << "cannot load color scheme from"
+                            << origName;
         }
 
         if (!cs)
@@ -452,7 +452,7 @@ void TerminalWidget::sendText(const QString &text)
 
 void TerminalWidget::resizeEvent(QResizeEvent*)
 {
-//qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
+    //qDebug("global window resizing...with %d %d", this->size().width(), this->size().height());
     m_impl->m_terminalDisplay->resize(this->size());
 }
 

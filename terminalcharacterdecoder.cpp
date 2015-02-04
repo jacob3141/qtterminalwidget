@@ -27,9 +27,9 @@
 #include <QTextStream>
 
 PlainTextDecoder::PlainTextDecoder()
- : _output(0)
- , _includeTrailingWhitespace(true)
- , _recordLinePositions(false)
+    : _output(0)
+    , _includeTrailingWhitespace(true)
+    , _recordLinePositions(false)
 {
 
 }
@@ -43,9 +43,9 @@ bool PlainTextDecoder::trailingWhitespace() const
 }
 void PlainTextDecoder::begin(QTextStream* output)
 {
-   _output = output;
-   if (!_linePositions.isEmpty())
-       _linePositions.clear();
+    _output = output;
+    if (!_linePositions.isEmpty())
+        _linePositions.clear();
 }
 void PlainTextDecoder::end()
 {
@@ -61,7 +61,7 @@ QList<int> PlainTextDecoder::linePositions() const
     return _linePositions;
 }
 void PlainTextDecoder::decodeLine(const Character* const characters, int count, LineProperty /*properties*/
-                             )
+                                  )
 {
     Q_ASSERT( _output );
 
@@ -78,7 +78,7 @@ void PlainTextDecoder::decodeLine(const Character* const characters, int count, 
     //(since QTextStream always deals with QStrings internally anyway)
     QString plainText;
     plainText.reserve(count);
-   
+
     int outputCount = count;
 
     // if inclusion of trailing whitespace is disabled then find the end of the
@@ -103,10 +103,10 @@ void PlainTextDecoder::decodeLine(const Character* const characters, int count, 
 }
 
 HTMLDecoder::HTMLDecoder() :
-        _output(0)
-    ,_colorTable(base_color_table)
-       ,_innerSpanOpen(false)
-       ,_lastRendition(DEFAULT_RENDITION)
+    _output(0)
+  ,_colorTable(base_color_table)
+  ,_innerSpanOpen(false)
+  ,_lastRendition(DEFAULT_RENDITION)
 {
     
 }
@@ -139,14 +139,14 @@ void HTMLDecoder::end()
 
 //TODO: Support for LineProperty (mainly double width , double height)
 void HTMLDecoder::decodeLine(const Character* const characters, int count, LineProperty /*properties*/
-                            )
+                             )
 {
     Q_ASSERT( _output );
 
     QString text;
 
     int spaceCount = 0;
-        
+
     for (int i=0;i<count;i++)
     {
         QChar ch(characters[i].character);
@@ -157,7 +157,7 @@ void HTMLDecoder::decodeLine(const Character* const characters, int count, LineP
              characters[i].backgroundColor != _lastBackColor )
         {
             if ( _innerSpanOpen )
-                    closeSpan(text);
+                closeSpan(text);
 
             _lastRendition = characters[i].rendition;
             _lastForeColor = characters[i].foregroundColor;
@@ -177,10 +177,10 @@ void HTMLDecoder::decodeLine(const Character* const characters, int count, LineP
                 style.append("font-weight:bold;");
 
             if ( _lastRendition & RE_UNDERLINE )
-                    style.append("font-decoration:underline;");
-        
+                style.append("font-decoration:underline;");
+
             //colours - a colour table must have been defined first
-            if ( _colorTable )    
+            if ( _colorTable )
             {
                 style.append( QString("color:%1;").arg(_lastForeColor.color(_colorTable).name() ) );
 
@@ -189,8 +189,8 @@ void HTMLDecoder::decodeLine(const Character* const characters, int count, LineP
                     style.append( QString("background-color:%1;").arg(_lastBackColor.color(_colorTable).name() ) );
                 }
             }
-        
-            //open the span with the current style    
+
+            //open the span with the current style
             openSpan(text,style);
             _innerSpanOpen = true;
         }
@@ -209,9 +209,9 @@ void HTMLDecoder::decodeLine(const Character* const characters, int count, LineP
             if ( ch == '<' )
                 text.append("&lt;");
             else if (ch == '>')
-                    text.append("&gt;");
-            else    
-                    text.append(ch);
+                text.append("&gt;");
+            else
+                text.append(ch);
         }
         else
         {

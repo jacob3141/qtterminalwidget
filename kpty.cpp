@@ -159,7 +159,7 @@ extern "C" {
 //////////////////
 
 KPtyPrivate::KPtyPrivate(KPty* parent) :
-        masterFd(-1), slaveFd(-1), ownMaster(true), q_ptr(parent)
+    masterFd(-1), slaveFd(-1), ownMaster(true), q_ptr(parent)
 {
 }
 
@@ -169,8 +169,8 @@ KPtyPrivate::~KPtyPrivate()
 
 bool KPtyPrivate::chownpty(bool)
 {
-//    return !QProcess::execute(KStandardDirs::findExe("kgrantpty"),
-//        QStringList() << (grant?"--grant":"--revoke") << QString::number(masterFd));
+    //    return !QProcess::execute(KStandardDirs::findExe("kgrantpty"),
+    //        QStringList() << (grant?"--grant":"--revoke") << QString::number(masterFd));
     return true;
 }
 
@@ -179,12 +179,12 @@ bool KPtyPrivate::chownpty(bool)
 /////////////////////////////
 
 KPty::KPty() :
-        d_ptr(new KPtyPrivate(this))
+    d_ptr(new KPtyPrivate(this))
 {
 }
 
 KPty::KPty(KPtyPrivate *d) :
-        d_ptr(d)
+    d_ptr(d)
 {
     d_ptr->q_ptr = this;
 }
@@ -251,9 +251,9 @@ bool KPty::open()
         if (ptsn) {
             d->ttyName = ptsn;
 #else
-    int ptyno;
-    if (!ioctl(d->masterFd, TIOCGPTN, &ptyno)) {
-        d->ttyName = QByteArray("/dev/pts/") + QByteArray::number(ptyno);
+        int ptyno;
+        if (!ioctl(d->masterFd, TIOCGPTN, &ptyno)) {
+            d->ttyName = QByteArray("/dev/pts/") + QByteArray::number(ptyno);
 #endif
 #ifdef HAVE_GRANTPT
             if (!grantpt(d->masterFd)) {
@@ -261,7 +261,7 @@ bool KPty::open()
             }
 #else
 
-    goto gotpty;
+            goto gotpty;
 #endif
         }
         ::close(d->masterFd);
@@ -320,11 +320,11 @@ gotpty:
         // there was some sort of leak?  I only had a few open.
     }
     if (((st.st_uid != getuid()) ||
-            (st.st_mode & (S_IRGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH))) &&
+         (st.st_mode & (S_IRGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH))) &&
             !d->chownpty(true)) {
         qWarning()
-        << "chownpty failed for device " << ptyName << "::" << d->ttyName
-        << "\nThis means the communication can be eavesdropped." << endl;
+                << "chownpty failed for device " << ptyName << "::" << d->ttyName
+                << "\nThis means the communication can be eavesdropped." << endl;
     }
 
 #if defined (HAVE__GETPTY) || defined (HAVE_GRANTPT)
@@ -367,14 +367,14 @@ grantedpt:
 bool KPty::open(int fd)
 {
 #if !defined(HAVE_PTSNAME) && !defined(TIOCGPTN)
-     qWarning() << "Unsupported attempt to open pty with fd" << fd;
-     return false;
+    qWarning() << "Unsupported attempt to open pty with fd" << fd;
+    return false;
 #else
     Q_D(KPty);
 
     if (d->masterFd >= 0) {
         qWarning() << "Attempting to open an already open pty";
-         return false;
+        return false;
     }
 
     d->ownMaster = false;
@@ -422,16 +422,16 @@ bool KPty::openSlave()
     Q_D(KPty);
 
     if (d->slaveFd >= 0)
-	return true;
+        return true;
     if (d->masterFd < 0) {
-	qDebug() << "Attempting to open pty slave while master is closed";
-	return false;
+        qDebug() << "Attempting to open pty slave while master is closed";
+        return false;
     }
     //d->slaveFd = KDE_open(d->ttyName.data(), O_RDWR | O_NOCTTY);
     d->slaveFd = ::open(d->ttyName.data(), O_RDWR | O_NOCTTY);
     if (d->slaveFd < 0) {
-	qDebug() << "Can't open slave pseudo teletype";
-	return false;
+        qDebug() << "Can't open slave pseudo teletype";
+        return false;
     }
     fcntl(d->slaveFd, F_SETFD, FD_CLOEXEC);
     return true;
@@ -631,10 +631,10 @@ void KPty::logout()
     }
     endutxent();
 #  else
-    ut->ut_time = time(0);
-    pututline(ut);
-}
-endutent();
+        ut->ut_time = time(0);
+        pututline(ut);
+    }
+    endutent();
 #  endif
 # endif
 #endif

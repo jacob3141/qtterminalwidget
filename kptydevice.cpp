@@ -48,13 +48,13 @@
 #endif
 
 #if defined(Q_OS_FREEBSD) || defined(Q_OS_MAC)
-  // "the other end's output queue size" - kinda braindead, huh?
+// "the other end's output queue size" - kinda braindead, huh?
 # define PTY_BYTES_AVAILABLE TIOCOUTQ
 #elif defined(TIOCINQ)
-  // "our end's input queue size"
+// "our end's input queue size"
 # define PTY_BYTES_AVAILABLE TIOCINQ
 #else
-  // likewise. more generic ioctl (theoretically)
+// likewise. more generic ioctl (theoretically)
 # define PTY_BYTES_AVAILABLE FIONREAD
 #endif
 
@@ -124,9 +124,9 @@ bool KPtyDevicePrivate::_k_canRead()
         readBytes = 0;
         while (!readBytes)
 #endif
-        // Useless block braces except in Solaris
+            // Useless block braces except in Solaris
         {
-          NO_INTR(readBytes, read(q->masterFd(), ptr, available));
+            NO_INTR(readBytes, read(q->masterFd(), ptr, available));
         }
         if (readBytes < 0) {
             readBuffer.unreserve(available);
@@ -184,21 +184,21 @@ bool KPtyDevicePrivate::_k_canWrite()
 // Lifted from GLIBC
 # define timeradd(a, b, result) \
     do { \
-        (result)->tv_sec = (a)->tv_sec + (b)->tv_sec; \
-        (result)->tv_usec = (a)->tv_usec + (b)->tv_usec; \
-        if ((result)->tv_usec >= 1000000) { \
-            ++(result)->tv_sec; \
-            (result)->tv_usec -= 1000000; \
-        } \
+    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec; \
+    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec; \
+    if ((result)->tv_usec >= 1000000) { \
+    ++(result)->tv_sec; \
+    (result)->tv_usec -= 1000000; \
+    } \
     } while (0)
 # define timersub(a, b, result) \
     do { \
-        (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; \
-        (result)->tv_usec = (a)->tv_usec - (b)->tv_usec; \
-        if ((result)->tv_usec < 0) { \
-            --(result)->tv_sec; \
-            (result)->tv_usec += 1000000; \
-        } \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec; \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec; \
+    if ((result)->tv_usec < 0) { \
+    --(result)->tv_sec; \
+    (result)->tv_usec += 1000000; \
+    } \
     } while (0)
 #endif
 

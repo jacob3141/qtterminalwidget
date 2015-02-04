@@ -36,13 +36,13 @@
 static int blocksize = 0;
 
 BlockArray::BlockArray()
-        : size(0),
-        current(size_t(-1)),
-        index(size_t(-1)),
-        lastmap(0),
-        lastmap_index(size_t(-1)),
-        lastblock(0), ion(-1),
-        length(0)
+    : size(0),
+      current(size_t(-1)),
+      index(size_t(-1)),
+      lastmap(0),
+      lastmap_index(size_t(-1)),
+      lastblock(0), ion(-1),
+      length(0)
 {
     // lastmap_index = index = current = size_t(-1);
     if (blocksize == 0) {
@@ -139,10 +139,10 @@ const Block * BlockArray::at(size_t i)
         return 0;
     }
 
-//     if (index - i >= length) {
-//         kDebug(1211) << "BlockArray::at() index - i >= length\n";
-//         return 0;
-//     }
+    //     if (index - i >= length) {
+    //         kDebug(1211) << "BlockArray::at() index - i >= length\n";
+    //         return 0;
+    //     }
 
     size_t j = i; // (current - (index - i) + (index/size+1)*size) % size ;
 
@@ -181,7 +181,7 @@ bool BlockArray::setSize(size_t newsize)
 
 bool BlockArray::setHistorySize(size_t newsize)
 {
-//    kDebug(1211) << "setHistorySize " << size << " " << newsize;
+    //    kDebug(1211) << "setHistorySize " << size << " " << newsize;
 
     if (size == newsize) {
         return false;

@@ -42,7 +42,7 @@ public:
     };
 
     TerminalWidget(int startnow, // 1 = start shell programm immediatelly
-                QWidget * parent = 0);
+                   QWidget * parent = 0);
 
     TerminalWidget(QWidget *parent = 0);
 
@@ -187,7 +187,7 @@ public slots:
     // Paste clipboard to terminal
     void pasteClipboard();
 
-    // Paste selection to terminal 
+    // Paste selection to terminal
     void pasteSelection();
 
     // Set zoom

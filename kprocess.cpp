@@ -271,7 +271,7 @@ void KProcess::setShellCommand(const QString &cmd)
 
     KShell::Errors err;
     d->args = KShell::splitArgs(
-            cmd, KShell::AbortOnMeta | KShell::TildeExpand, &err);
+                cmd, KShell::AbortOnMeta | KShell::TildeExpand, &err);
     if (err == KShell::NoError && !d->args.isEmpty()) {
         d->prog = KStandardDirs::findExe(d->args[0]);
         if (!d->prog.isEmpty()) {
@@ -286,7 +286,7 @@ void KProcess::setShellCommand(const QString &cmd)
     d->args.clear();
 
 #ifdef Q_OS_UNIX
-// #ifdef NON_FREE // ... as they ship non-POSIX /bin/sh
+    // #ifdef NON_FREE // ... as they ship non-POSIX /bin/sh
 # if !defined(__linux__) && !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__) && !defined(__DragonFly__) && !defined(__GNU__)
     // If /bin/sh is a symlink, we can be pretty sure that it points to a
     // POSIX shell - the original bourne shell is about the only non-POSIX

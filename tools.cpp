@@ -19,7 +19,7 @@ QString get_kb_layout_dir()
 #ifdef BUNDLE_KEYBOARDLAYOUTS
     return QLatin1String(":/");
 #else
-//    qDebug() << __FILE__ << __FUNCTION__;
+    //    qDebug() << __FILE__ << __FUNCTION__;
 
     QString rval = "";
     QString k(KB_LAYOUT_DIR);
@@ -57,13 +57,13 @@ QString get_color_schemes_dir()
 #ifdef BUNDLE_COLORSCHEMES
     return QLatin1String(":/");
 #else
-//    qDebug() << __FILE__ << __FUNCTION__;
+    //    qDebug() << __FILE__ << __FUNCTION__;
 
     QString rval = "";
     QString k(COLORSCHEMES_DIR);
     QDir d(k);
 
-//    qDebug() << "default COLORSCHEMES_DIR: " << k;
+    //    qDebug() << "default COLORSCHEMES_DIR: " << k;
 
     if (d.exists())
         rval =  k.append("/");

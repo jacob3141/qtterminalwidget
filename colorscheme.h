@@ -34,15 +34,15 @@
 class QIODevice;
 
 /**
- * Represents a color scheme for a terminal display.  
+ * Represents a color scheme for a terminal display.
  *
  * The color scheme includes the palette of colors used to draw the text and character backgrounds
- * in the display and the opacity level of the display background. 
+ * in the display and the opacity level of the display background.
  */
 class ColorScheme {
 public:
-    /** 
-     * Constructs a new color scheme which is initialised to the default color set 
+    /**
+     * Constructs a new color scheme which is initialised to the default color set
      * for Konsole.
      */
     ColorScheme();
@@ -64,7 +64,7 @@ public:
     /** Sets a single entry within the color palette. */
     void setColorTableEntry(int index , const ColorEntry& entry);
 
-    /** 
+    /**
      * Copies the color entries which form the palette for this color scheme
      * into @p table.  @p table should be an array with TABLE_COLORS entries.
      *
@@ -74,7 +74,7 @@ public:
      * palette to be randomized.  The seed is used to pick the random color.
      */
     void getColorTable(ColorEntry* table, uint randomSeed = 0) const;
-   
+
     /**
      * Retrieves a single color entry from the table.
      *
@@ -82,28 +82,28 @@ public:
      */
     ColorEntry colorEntry(int index , uint randomSeed = 0) const;
 
-    /** 
-     * Convenience method.  Returns the 
-     * foreground color for this scheme, 
-     * this is the primary color used to draw the 
+    /**
+     * Convenience method.  Returns the
+     * foreground color for this scheme,
+     * this is the primary color used to draw the
      * text in this scheme.
      */
     QColor foregroundColor() const;
     /**
-     * Convenience method.  Returns the background color for 
-     * this scheme, this is the primary color used to 
+     * Convenience method.  Returns the background color for
+     * this scheme, this is the primary color used to
      * draw the terminal background in this scheme.
      */
     QColor backgroundColor() const;
 
-    /** 
+    /**
      * Returns true if this color scheme has a dark background.
      * The background color is said to be dark if it has a value of less than 127
      * in the HSV color space.
      */
     bool hasDarkBackground() const;
 
-    /** 
+    /**
      * Sets the opacity level of the display background. @p opacity ranges
      * between 0 (completely transparent background) and 1 (completely
      * opaque background).
@@ -113,18 +113,18 @@ public:
      * TODO: More documentation
      */
     void setOpacity(qreal opacity);
-    /** 
+    /**
      * Returns the opacity level for this color scheme, see setOpacity()
      * TODO: More documentation
      */
     qreal opacity() const;
 
-    /** 
+    /**
      * Enables randomization of the background color.  This will cause
      * the palette returned by getColorTable() and colorEntry() to
      * be adjusted depending on the value of the random seed argument
      * to them.
-     */ 
+     */
     void setRandomizedBackgroundColor(bool randomize);
 
     /** Returns true if the background color is randomized. */
@@ -140,7 +140,7 @@ private:
     public:
         RandomizationRange() : hue(0) , saturation(0) , value(0) {}
 
-        bool isNull() const 
+        bool isNull() const
         {
             return ( hue == 0 && saturation == 0 && value == 0 );
         }
@@ -156,8 +156,8 @@ private:
 
     void readColorEntry(QSettings *s, int index);
 
-    // sets the amount of randomization allowed for a particular color 
-    // in the palette.  creates the randomization table if 
+    // sets the amount of randomization allowed for a particular color
+    // in the palette.  creates the randomization table if
     // it does not already exist
     void setRandomizationRange( int index , quint16 hue , quint8 saturation , quint8 value );
 
@@ -165,14 +165,14 @@ private:
     QString _name;
     qreal _opacity;
     ColorEntry* _table; // pointer to custom color table or 0 if the default
-                        // color scheme is being used
+    // color scheme is being used
 
 
     static const quint16 MAX_HUE = 340;
 
     RandomizationRange* _randomTable;   // pointer to randomization table or 0
-                                        // if no colors in the color scheme support
-                                        // randomization
+    // if no colors in the color scheme support
+    // randomization
 
     static const char* const colorNames[TABLE_COLORS];
     static const char* const translatedColorNames[TABLE_COLORS];
@@ -206,13 +206,13 @@ public:
 class KDE3ColorSchemeReader
 {
 public:
-    /** 
-     * Constructs a new reader which reads from the specified device. 
-     * The device should be open in read-only mode. 
+    /**
+     * Constructs a new reader which reads from the specified device.
+     * The device should be open in read-only mode.
      */
     KDE3ColorSchemeReader( QIODevice* device );
 
-    /** 
+    /**
      * Reads and parses the contents of the .schema file from the input
      * device and returns the ColorScheme defined within it.
      *
@@ -255,7 +255,7 @@ public:
      * Returns the default color scheme for Konsole
      */
     const ColorScheme* defaultColorScheme() const;
- 
+
     /**
      * Returns the color scheme with the given name or 0 if no
      * scheme with that name exists.  If @p name is empty, the
@@ -267,18 +267,18 @@ public:
     const ColorScheme* findColorScheme(const QString& name);
 
     /**
-     * Deletes a color scheme.  Returns true on successful deletion or false otherwise. 
+     * Deletes a color scheme.  Returns true on successful deletion or false otherwise.
      */
     bool deleteColorScheme(const QString& name);
 
-    /** 
-     * Returns a list of the all the available color schemes. 
+    /**
+     * Returns a list of the all the available color schemes.
      * This may be slow when first called because all of the color
      * scheme resources on disk must be located, read and parsed.
      *
-     * Subsequent calls will be inexpensive. 
+     * Subsequent calls will be inexpensive.
      */
-    QList<const ColorScheme*> allColorSchemes();    
+    QList<const ColorScheme*> allColorSchemes();
 
     /** Returns the global color scheme manager instance. */
     static ColorSchemeManager* instance();

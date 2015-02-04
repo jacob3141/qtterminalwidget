@@ -112,8 +112,8 @@ QList<Filter::HotSpot*> FilterChain::hotSpots() const
 //QList<Filter::HotSpot*> FilterChain::hotSpotsAtLine(int line) const;
 
 TerminalImageFilterChain::TerminalImageFilterChain()
-: _buffer(0)
-, _linePositions(0)
+    : _buffer(0)
+    , _linePositions(0)
 {
 }
 
@@ -159,7 +159,7 @@ void TerminalImageFilterChain::setImage(const Character* const image , int lines
         // being treated as part of a link that occurs at the start of the next line
         //
         // the downside is that links which are spread over more than one line are not
-        // highlighted.  
+        // highlighted.
         //
         // TODO - Use the "line wrapped" attribute associated with lines in a
         // terminal image to avoid adding this imaginary character for wrapped
@@ -171,8 +171,8 @@ void TerminalImageFilterChain::setImage(const Character* const image , int lines
 }
 
 Filter::Filter() :
-_linePositions(0),
-_buffer(0)
+    _linePositions(0),
+    _buffer(0)
 {
 }
 
@@ -211,7 +211,7 @@ void Filter::getLineColumn(int position , int& startLine , int& startColumn)
         else
             nextLine = _linePositions->value(i+1);
 
-        if ( _linePositions->value(i) <= position && position < nextLine ) 
+        if ( _linePositions->value(i) <= position && position < nextLine )
         {
             startLine = i;
             startColumn = string_width(buffer()->mid(_linePositions->value(i),position - _linePositions->value(i)));
@@ -219,7 +219,7 @@ void Filter::getLineColumn(int position , int& startLine , int& startColumn)
         }
     }
 }
-    
+
 
 /*void Filter::addLine(const QString& text)
 {
@@ -241,7 +241,7 @@ void Filter::addHotSpot(HotSpot* spot)
     for (int line = spot->startLine() ; line <= spot->endLine() ; line++)
     {
         _hotspots.insert(line,spot);
-    }    
+    }
 }
 QList<Filter::HotSpot*> Filter::hotSpots() const
 {
@@ -264,7 +264,7 @@ Filter::HotSpot* Filter::hotSpotAt(int line , int column) const
             continue;
         if ( spot->endLine() == line && spot->endColumn() < column )
             continue;
-       
+
         return spot;
     }
 
@@ -375,37 +375,37 @@ void RegExpFilter::process()
             getLineColumn(pos + _searchText.matchedLength(),endLine,endColumn);
 
             RegExpFilter::HotSpot* spot = newHotSpot(startLine,startColumn,
-                                           endLine,endColumn);
+                                                     endLine,endColumn);
             spot->setCapturedTexts(_searchText.capturedTexts());
 
-            addHotSpot( spot );  
+            addHotSpot( spot );
             pos += _searchText.matchedLength();
 
             // if matchedLength == 0, the program will get stuck in an infinite loop
             if ( _searchText.matchedLength() == 0 )
                 pos = -1;
         }
-    }    
+    }
 }
 
 RegExpFilter::HotSpot* RegExpFilter::newHotSpot(int startLine,int startColumn,
                                                 int endLine,int endColumn)
 {
     return new RegExpFilter::HotSpot(startLine,startColumn,
-                                                  endLine,endColumn);
+                                     endLine,endColumn);
 }
 RegExpFilter::HotSpot* UrlFilter::newHotSpot(int startLine,int startColumn,int endLine,
-                                                    int endColumn)
+                                             int endColumn)
 {
     HotSpot *spot = new UrlFilter::HotSpot(startLine,startColumn,
-                                               endLine,endColumn);
+                                           endLine,endColumn);
     connect(spot->getUrlObject(), SIGNAL(activated(QUrl)), this, SIGNAL(activated(QUrl)));
     return spot;
 }
 
 UrlFilter::HotSpot::HotSpot(int startLine,int startColumn,int endLine,int endColumn)
-: RegExpFilter::HotSpot(startLine,startColumn,endLine,endColumn)
-, _urlObject(new FilterObject(this))
+    : RegExpFilter::HotSpot(startLine,startColumn,endLine,endColumn)
+    , _urlObject(new FilterObject(this))
 {
     setType(Link);
 }
@@ -417,9 +417,9 @@ QString UrlFilter::HotSpot::tooltip() const
     const UrlType kind = urlType();
 
     if ( kind == StandardUrl )
-        return QString(); 
+        return QString();
     else if ( kind == Email )
-        return QString(); 
+        return QString();
     else
         return QString();
 }
@@ -457,12 +457,12 @@ void UrlFilter::HotSpot::activate(const QString& actionName)
             {
                 url.prepend("http://");
             }
-        } 
+        }
         else if ( kind == Email )
         {
             url.prepend("mailto:");
         }
-    
+
         _urlObject->emitActivated(url);
     }
 }
@@ -482,7 +482,7 @@ const QRegExp UrlFilter::EmailAddressRegExp("\\b(\\w|\\.|-)+@(\\w|\\.|-)+\\.\\w+
 
 // matches full url or email address
 const QRegExp UrlFilter::CompleteUrlRegExp('('+FullUrlRegExp.pattern()+'|'+
-                                            EmailAddressRegExp.pattern()+')');
+                                           EmailAddressRegExp.pattern()+')');
 
 UrlFilter::UrlFilter()
 {
@@ -543,7 +543,7 @@ QList<QAction*> UrlFilter::HotSpot::actions()
     list << openAction;
     list << copyAction;
 
-    return list; 
+    return list;
 }
 
 //#include "Filter.moc"

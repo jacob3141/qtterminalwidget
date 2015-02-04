@@ -47,135 +47,135 @@
 #include <QTimer>
 
 struct CharCodes {
-  // coding info
-  char charset[4]; //
-  int  cu_cs;      // actual charset.
-  bool graphic;    // Some VT100 tricks
-  bool pound  ;    // Some VT100 tricks
-  bool sa_graphic; // saved graphic
-  bool sa_pound;   // saved pound
+    // coding info
+    char charset[4]; //
+    int  cu_cs;      // actual charset.
+    bool graphic;    // Some VT100 tricks
+    bool pound  ;    // Some VT100 tricks
+    bool sa_graphic; // saved graphic
+    bool sa_pound;   // saved pound
 };
 
 /**
  * Provides an xterm compatible terminal emulation based on the DEC VT102 terminal.
  * A full description of this terminal can be found at http://vt100.net/docs/vt102-ug/
- * 
- * In addition, various additional xterm escape sequences are supported to provide 
+ *
+ * In addition, various additional xterm escape sequences are supported to provide
  * features such as mouse input handling.
  * See http://rtfm.etla.org/xterm/ctlseq.html for a description of xterm's escape
- * sequences. 
+ * sequences.
  *
  */
 class Vt102Emulation : public Emulation {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-  /** Constructs a new emulation */
-  Vt102Emulation();
-  ~Vt102Emulation();
-  
-  // reimplemented from Emulation
-  virtual void clearEntireScreen();
-  virtual void reset();
-  virtual char eraseChar() const;
-  
+    /** Constructs a new emulation */
+    Vt102Emulation();
+    ~Vt102Emulation();
+
+    // reimplemented from Emulation
+    virtual void clearEntireScreen();
+    virtual void reset();
+    virtual char eraseChar() const;
+
 public slots: 
-  // reimplemented from Emulation 
-  virtual void sendString(const char*,int length = -1);
-  virtual void sendText(const QString& text);
-  virtual void sendKeyEvent(QKeyEvent*);
-  virtual void sendMouseEvent(int buttons, int column, int line, int eventType);
-  
+    // reimplemented from Emulation
+    virtual void sendString(const char*,int length = -1);
+    virtual void sendText(const QString& text);
+    virtual void sendKeyEvent(QKeyEvent*);
+    virtual void sendMouseEvent(int buttons, int column, int line, int eventType);
+
 protected:
-  // reimplemented from Emulation
-  virtual void setMode(int mode);
-  virtual void resetMode(int mode);
-  virtual void receiveChar(int cc);
-  
+    // reimplemented from Emulation
+    virtual void setMode(int mode);
+    virtual void resetMode(int mode);
+    virtual void receiveChar(int cc);
+
 private slots:
-  //causes changeTitle() to be emitted for each (int,QString) pair in pendingTitleUpdates
-  //used to buffer multiple title updates
-  void updateTitle();
+    //causes changeTitle() to be emitted for each (int,QString) pair in pendingTitleUpdates
+    //used to buffer multiple title updates
+    void updateTitle();
 
 private:
-  unsigned short applyCharset(unsigned short c);
-  void setCharset(int n, int cs);
-  void useCharset(int n);
-  void setAndUseCharset(int n, int cs);
-  void saveCursor();
-  void restoreCursor();
-  void resetCharset(int scrno);
+    unsigned short applyCharset(unsigned short c);
+    void setCharset(int n, int cs);
+    void useCharset(int n);
+    void setAndUseCharset(int n, int cs);
+    void saveCursor();
+    void restoreCursor();
+    void resetCharset(int scrno);
 
-  void setMargins(int top, int bottom);
-  //set margins for all screens back to their defaults
-  void setDefaultMargins();
+    void setMargins(int top, int bottom);
+    //set margins for all screens back to their defaults
+    void setDefaultMargins();
 
-  // returns true if 'mode' is set or false otherwise
-  bool getMode    (int mode);
-  // saves the current boolean value of 'mode'
-  void saveMode   (int mode);
-  // restores the boolean value of 'mode' 
-  void restoreMode(int mode);
-  // resets all modes
-  // (except MODE_Allow132Columns)
-  void resetModes();
+    // returns true if 'mode' is set or false otherwise
+    bool getMode    (int mode);
+    // saves the current boolean value of 'mode'
+    void saveMode   (int mode);
+    // restores the boolean value of 'mode'
+    void restoreMode(int mode);
+    // resets all modes
+    // (except MODE_Allow132Columns)
+    void resetModes();
 
-  void resetTokenizer();
-  #define MAX_TOKEN_LENGTH 80
-  void addToCurrentToken(int cc);
-  int tokenBuffer[MAX_TOKEN_LENGTH]; //FIXME: overflow?
-  int tokenBufferPos;
+    void resetTokenizer();
+#define MAX_TOKEN_LENGTH 80
+    void addToCurrentToken(int cc);
+    int tokenBuffer[MAX_TOKEN_LENGTH]; //FIXME: overflow?
+    int tokenBufferPos;
 #define MAXARGS 15
-  void addDigit(int dig);
-  void addArgument();
-  int argv[MAXARGS];
-  int argc;
-  void initTokenizer();
+    void addDigit(int dig);
+    void addArgument();
+    int argv[MAXARGS];
+    int argc;
+    void initTokenizer();
 
-  // Set of flags for each of the ASCII characters which indicates
-  // what category they fall into (printable character, control, digit etc.)
-  // for the purposes of decoding terminal output
-  int charClass[256];
+    // Set of flags for each of the ASCII characters which indicates
+    // what category they fall into (printable character, control, digit etc.)
+    // for the purposes of decoding terminal output
+    int charClass[256];
 
-  void reportDecodingError(); 
+    void reportDecodingError();
 
-  void processToken(int code, int p, int q);
-  void processWindowAttributeChange();
+    void processToken(int code, int p, int q);
+    void processWindowAttributeChange();
 
-  void reportTerminalType();
-  void reportSecondaryAttributes();
-  void reportStatus();
-  void reportAnswerBack();
-  void reportCursorPosition();
-  void reportTerminalParms(int p);
+    void reportTerminalType();
+    void reportSecondaryAttributes();
+    void reportStatus();
+    void reportAnswerBack();
+    void reportCursorPosition();
+    void reportTerminalParms(int p);
 
-  void onScrollLock();
-  void scrollLock(const bool lock);
+    void onScrollLock();
+    void scrollLock(const bool lock);
 
-  // clears the screen and resizes it to the specified
-  // number of columns
-  void clearScreenAndSetColumns(int columnCount);
+    // clears the screen and resizes it to the specified
+    // number of columns
+    void clearScreenAndSetColumns(int columnCount);
 
-  CharCodes _charset[2];
+    CharCodes _charset[2];
 
-  class TerminalState
-  {
-  public:
-    // Initializes all modes to false
-    TerminalState()
-    { memset(&mode,false,MODE_total * sizeof(bool)); }
+    class TerminalState
+    {
+    public:
+        // Initializes all modes to false
+        TerminalState()
+        { memset(&mode,false,MODE_total * sizeof(bool)); }
 
-    bool mode[MODE_total];
-  };
+        bool mode[MODE_total];
+    };
 
-  TerminalState _currentModes;
-  TerminalState _savedModes;
+    TerminalState _currentModes;
+    TerminalState _savedModes;
 
-  //hash table and timer for buffering calls to the session instance 
-  //to update the name of the session
-  //or window title.
-  //these calls occur when certain escape sequences are seen in the 
-  //output from the terminal
-  QHash<int,QString> _pendingTitleUpdates;
-  QTimer* _titleUpdateTimer;
+    //hash table and timer for buffering calls to the session instance
+    //to update the name of the session
+    //or window title.
+    //these calls occur when certain escape sequences are seen in the
+    //output from the terminal
+    QHash<int,QString> _pendingTitleUpdates;
+    QTimer* _titleUpdateTimer;
 };

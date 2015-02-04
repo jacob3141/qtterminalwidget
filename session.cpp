@@ -47,31 +47,31 @@ int Session::lastSessionId = 0;
 
 Session::Session(QObject* parent) : 
     QObject(parent),
-        _shellProcess(0)
-        , _emulation(0)
-        , _monitorActivity(false)
-        , _monitorSilence(false)
-        , _notifiedActivity(false)
-        , _autoClose(true)
-        , _wantedClose(false)
-        , _silenceSeconds(10)
-        , _addToUtmp(false)  // disabled by default because of a bug encountered on certain systems
-        // which caused Konsole to hang when closing a tab and then opening a new
-        // one.  A 'QProcess destroyed while still running' warning was being
-        // printed to the terminal.  Likely a problem in KPty::logout()
-        // or KPty::login() which uses a QProcess to start /usr/bin/utempter
-        , _flowControl(true)
-        , _fullScripting(false)
-        , _sessionId(0)
-//   , _zmodemBusy(false)
-//   , _zmodemProc(0)
-//   , _zmodemProgress(0)
-        , _hasDarkBackground(false)
+    _shellProcess(0)
+  , _emulation(0)
+  , _monitorActivity(false)
+  , _monitorSilence(false)
+  , _notifiedActivity(false)
+  , _autoClose(true)
+  , _wantedClose(false)
+  , _silenceSeconds(10)
+  , _addToUtmp(false)  // disabled by default because of a bug encountered on certain systems
+  // which caused Konsole to hang when closing a tab and then opening a new
+  // one.  A 'QProcess destroyed while still running' warning was being
+  // printed to the terminal.  Likely a problem in KPty::logout()
+  // or KPty::login() which uses a QProcess to start /usr/bin/utempter
+  , _flowControl(true)
+  , _fullScripting(false)
+  , _sessionId(0)
+  //   , _zmodemBusy(false)
+  //   , _zmodemProc(0)
+  //   , _zmodemProgress(0)
+  , _hasDarkBackground(false)
 {
     //prepare DBus communication
-//    new SessionAdaptor(this);
+    //    new SessionAdaptor(this);
     _sessionId = ++lastSessionId;
-//    QDBusConnection::sessionBus().registerObject(QLatin1String("/Sessions/")+QString::number(_sessionId), this);
+    //    QDBusConnection::sessionBus().registerObject(QLatin1String("/Sessions/")+QString::number(_sessionId), this);
 
     //create teletype for I/O with shell process
     _shellProcess = new Pty();
@@ -83,8 +83,8 @@ Session::Session(QObject* parent) :
              this, SLOT( setUserTitle( int, const QString & ) ) );
     connect( _emulation, SIGNAL( stateSet(int) ),
              this, SLOT( activityStateSet(int) ) );
-//    connect( _emulation, SIGNAL( zmodemDetected() ), this ,
-//            SLOT( fireZModemDetected() ) );
+    //    connect( _emulation, SIGNAL( zmodemDetected() ), this ,
+    //            SLOT( fireZModemDetected() ) );
     connect( _emulation, SIGNAL( changeTabTextColorRequest( int ) ),
              this, SIGNAL( changeTabTextColorRequest( int ) ) );
     connect( _emulation, SIGNAL(profileChangeCommandReceived(const QString &)),
@@ -208,7 +208,7 @@ void Session::addView(TerminalDisplay * widget)
 
     QObject::connect( widget ,SIGNAL(destroyed(QObject *)) , this ,
                       SLOT(viewDestroyed(QObject *)) );
-//slot for close
+    //slot for close
     QObject::connect(this, SIGNAL(finished()), widget, SLOT(close()));
 
 }
@@ -507,8 +507,8 @@ void Session::updateTerminalSize()
     while ( viewIter.hasNext() ) {
         TerminalDisplay * view = viewIter.next();
         if ( view->isHidden() == false &&
-                view->lines() >= VIEW_LINES_THRESHOLD &&
-                view->columns() >= VIEW_COLUMNS_THRESHOLD ) {
+             view->lines() >= VIEW_LINES_THRESHOLD &&
+             view->columns() >= VIEW_COLUMNS_THRESHOLD ) {
             minLines = (minLines == -1) ? view->lines() : qMin( minLines , view->lines() );
             minColumns = (minColumns == -1) ? view->columns() : qMin( minColumns , view->columns() );
         }
@@ -546,13 +546,13 @@ bool Session::sendSignal(int signal)
 {
     int result = ::kill(_shellProcess->pid(),signal);
 
-     if ( result == 0 )
-     {
-         _shellProcess->waitForFinished();
-         return true;
-     }
-     else
-         return false;
+    if ( result == 0 )
+    {
+        _shellProcess->waitForFinished();
+        return true;
+    }
+    else
+        return false;
 }
 
 void Session::close()
@@ -574,7 +574,7 @@ Session::~Session()
 {
     delete _emulation;
     delete _shellProcess;
-//  delete _zmodemProc;
+    //  delete _zmodemProc;
 }
 
 void Session::setProfileKey(const QString & key)
@@ -600,10 +600,10 @@ void Session::done(int exitStatus)
 
         if (_shellProcess->exitStatus() == QProcess::NormalExit) {
             message.sprintf("Session '%s' exited with status %d.",
-                          _nameTitle.toUtf8().data(), exitStatus);
+                            _nameTitle.toUtf8().data(), exitStatus);
         } else {
             message.sprintf("Session '%s' crashed.",
-                          _nameTitle.toUtf8().data());
+                            _nameTitle.toUtf8().data());
         }
     }
 
@@ -926,7 +926,7 @@ int Session::processId() const
 }
 
 SessionGroup::SessionGroup()
-        : _masterMode(0)
+    : _masterMode(0)
 {
 }
 SessionGroup::~SessionGroup()
@@ -1027,7 +1027,7 @@ void SessionGroup::setMasterStatus(Session * session, bool master)
 
 void SessionGroup::connectPair(Session * master , Session * other)
 {
-//    qDebug() << k_funcinfo;
+    //    qDebug() << k_funcinfo;
 
     if ( _masterMode & CopyInputToAll ) {
         qDebug() << "Connection session " << master->nameTitle() << "to" << other->nameTitle();
@@ -1038,7 +1038,7 @@ void SessionGroup::connectPair(Session * master , Session * other)
 }
 void SessionGroup::disconnectPair(Session * master , Session * other)
 {
-//    qDebug() << k_funcinfo;
+    //    qDebug() << k_funcinfo;
 
     if ( _masterMode & CopyInputToAll ) {
         qDebug() << "Disconnecting session " << master->nameTitle() << "from" << other->nameTitle();
