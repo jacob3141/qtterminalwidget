@@ -60,3 +60,5 @@ SOURCES += BlockArray.cpp \
 RESOURCES += color-schemes/color-schemes.qrc \
              designer/qtermwidgetplugin.qrc \
              kb-layouts/kb-layouts.qrc
+
+DEFINES += BUNDLE_KEYBOARDLAYOUTS

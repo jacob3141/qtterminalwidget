@@ -45,8 +45,7 @@ namespace Konsole
  * The color scheme includes the palette of colors used to draw the text and character backgrounds
  * in the display and the opacity level of the display background. 
  */
-class ColorScheme
-{
+class ColorScheme {
 public:
     /** 
      * Constructs a new color scheme which is initialised to the default color set 
@@ -66,13 +65,6 @@ public:
     /** Returns the name of the color scheme */
     QString name() const;
 
-#if 0
-// Implemented upstream - in user apps
-    /** Reads the color scheme from the specified configuration source */
-    void read(KConfig& config);
-    /** Writes the color scheme to the specified configuration source */
-    void write(KConfig& config) const;
-#endif
     void read(const QString & filename);
 
     /** Sets a single entry within the color palette. */
@@ -168,14 +160,6 @@ private:
     // this is the default color table.
     const ColorEntry* colorTable() const;
 
-#if 0
-// implemented upstream - user apps
-    // reads a single colour entry from a KConfig source
-    // and sets the palette entry at 'index' to the entry read.
-    void readColorEntry(KConfig& config , int index); 
-    // writes a single colour entry to a KConfig source
-    void writeColorEntry(KConfig& config , const QString& colorName, const ColorEntry& entry,const RandomizationRange& range) const;
-#endif
     void readColorEntry(QSettings *s, int index);
 
     // sets the amount of randomization allowed for a particular color 
@@ -288,15 +272,6 @@ public:
      */
     const ColorScheme* findColorScheme(const QString& name);
 
-#if 0
-    /**
-     * Adds a new color scheme to the manager.  If @p scheme has the same name as
-     * an existing color scheme, it replaces the existing scheme.
-     *
-     * TODO - Ensure the old color scheme gets deleted
-     */
-    void addColorScheme(ColorScheme* scheme);
-#endif
     /**
      * Deletes a color scheme.  Returns true on successful deletion or false otherwise. 
      */
