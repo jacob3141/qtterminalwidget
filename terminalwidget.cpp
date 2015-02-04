@@ -191,6 +191,8 @@ void TerminalWidget::initialize(bool startSession) {
     _session->addView(_terminalDisplay);
 
     connect(_session, SIGNAL(finished()), this, SLOT(sessionFinished()));
+
+    setColorScheme("WhiteOnBlack");
 }
 
 void TerminalWidget::createSession() {

@@ -50,17 +50,29 @@ public:
 
     virtual ~TerminalWidget();
 
+    /** @overload */
     QSize sizeHint() const;
 
+    /** Starts the specified shell program. */
     void startShellProgram();
 
+    /** @returns the shell program's process pid. */
     int shellPid();
 
+    /** TODO: document. */
     void changeDir(const QString& dir);
 
+    /**
+     * Sets the terminal font. Please be aware that you are only allowed
+     * to set monospaced fonts. Non-monospaced fonts will lead to graphical
+     * glitches.
+     */
     void setTerminalFont(const QFont& font);
+
+    /** @returns the current terminal font. */
     QFont terminalFont();
 
+    /** Sets the terminal background opacity. */
     void setTerminalOpacity(qreal level);
 
     /**
@@ -75,19 +87,22 @@ public:
     /** Shell program arguments. Default to none. */
     void setShellProgramArguments(const QStringList& arguments);
 
-    void setWorkingDirectory(const QString & dir);
+    /** Sets the current working directory. */
+    void setWorkingDirectory(const QString& dir);
+
     QString workingDirectory();
 
-
     /** Sets the text codec. Defaults to UTF-8. */
-    void setTextCodec(QTextCodec * codec);
+    void setTextCodec(QTextCodec *codec);
 
     /** @brief Sets the color scheme, default is white on black
      *
      * @param[in] name The name of the color scheme, either returned from
      * availableColorSchemes() or a full path to a color scheme.
      */
-    void setColorScheme(const QString & name);
+    void setColorScheme(const QString& name);
+
+    /** @returns a list of available color schemes. */
     static QStringList availableColorSchemes();
 
     /** Sets the terminal screen size. */
@@ -120,14 +135,15 @@ public:
     /** Get all available keyboard bindings. */
     static QStringList availableKeyBindings();
 
-    /** Return current key bindings.*/
+    /** @returns current key bindings.*/
     QString keyBindings();
     
     void setMotionAfterPasting(int);
 
-    /** Return the number of lines in the history buffer. */
+    /** @returns the number of lines in the history buffer. */
     int historyLinesCount();
 
+    /** @returns the number of screen columns. */
     int screenColumnsCount();
 
     void setSelectionStart(int row, int column);
@@ -136,7 +152,7 @@ public:
     void selectionEnd(int& row, int& column);
 
     /**
-     * Returns the currently selected text.
+     * @returns the currently selected text.
      * @param preserveLineBreaks Specifies whether new line characters should
      * be inserted into the returned text at the end of each terminal line.
      */
