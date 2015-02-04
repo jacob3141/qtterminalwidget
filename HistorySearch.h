@@ -16,8 +16,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     02110-1301  USA.
 */
-#ifndef TASK_H
-#define	TASK_H
+
+#pragma once
 
 #include <QObject>
 #include <QPointer>
@@ -65,6 +65,3 @@ private:
     int m_foundEndColumn;
     int m_foundEndLine;
 };
-
-#endif	/* TASK_H */
-

@@ -16,9 +16,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-
-#ifndef _Q_TERM_WIDGET
-#define _Q_TERM_WIDGET
+#pragma once
 
 #include <QWidget>
 #include "Filter.h"
@@ -234,6 +232,4 @@ private:
 extern "C"
 #endif
 void * createTermWidget(int startnow, void * parent);
-
-#endif
 

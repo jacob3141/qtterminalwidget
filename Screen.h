@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef SCREEN_H
-#define SCREEN_H
+#pragma once
 
 // Qt
 #include <QRect>
@@ -666,5 +665,3 @@ private:
 
     static Character defaultChar;
 };
-
-#endif // SCREEN_H

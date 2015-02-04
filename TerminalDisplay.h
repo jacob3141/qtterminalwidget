@@ -18,8 +18,7 @@
     02110-1301  USA.
 */
 
-#ifndef TERMINALDISPLAY_H
-#define TERMINALDISPLAY_H
+#pragma once
 
 // Qt
 #include <QColor>
@@ -29,7 +28,6 @@
 // Konsole
 #include "Filter.h"
 #include "Character.h"
-//#include "konsole_export.h"
 #define KONSOLEPRIVATE_EXPORT
 
 class QDrag;
@@ -849,5 +847,3 @@ private:
     QWidget* widget() const { return static_cast<QWidget*>(parent()); }
     int _timerId;
 };
-
-#endif // TERMINALDISPLAY_H

@@ -17,8 +17,7 @@
     02110-1301  USA.
 */
 
-#ifndef SCREENWINDOW_H
-#define SCREENWINDOW_H
+#pragma once
 
 // Qt
 #include <QObject>
@@ -251,5 +250,3 @@ private:
     int  _scrollCount; // count of lines which the window has been scrolled by since
                        // the last call to resetScrollCount()
 };
-
-#endif // SCREENWINDOW_H

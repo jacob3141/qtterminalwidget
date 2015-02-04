@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef BLOCKARRAY_H
-#define BLOCKARRAY_H
+#pragma once
 
 #include <unistd.h>
 
@@ -124,5 +123,3 @@ private:
     size_t length;
 
 };
-
-#endif

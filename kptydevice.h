@@ -26,8 +26,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef kptydev_h
-#define kptydev_h
+#pragma once
 
 #include "kpty_p.h"
 
@@ -356,6 +355,3 @@ struct KPtyDevicePrivate : public KPtyPrivate {
     KRingBuffer readBuffer;
     KRingBuffer writeBuffer;
 };
-
-#endif
-

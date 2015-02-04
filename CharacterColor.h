@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef CHARACTERCOLOR_H
-#define CHARACTERCOLOR_H
+#pragma once
 
 // Qt
 #include <QColor>
@@ -288,7 +287,3 @@ inline void CharacterColor::toggleIntensive()
     _v = !_v;
   }
 }
-
-
-#endif // CHARACTERCOLOR_H
-

@@ -27,10 +27,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef KPROCESS_H
-#define KPROCESS_H
-
-//#include <kdecore_export.h>
+#pragma once
 
 #include <QProcess>
 
@@ -368,5 +365,3 @@ protected:
     KProcess *q_ptr;
 };
 /* ------------------------------------------- */
-#endif
-

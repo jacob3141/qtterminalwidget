@@ -17,8 +17,7 @@
     02110-1301  USA.
 */
 
-#ifndef FILTER_H
-#define FILTER_H
+#pragma once
 
 // Qt
 #include <QAction>
@@ -385,5 +384,3 @@ private:
     QString* _buffer;
     QList<int>* _linePositions;
 };
-
-#endif //FILTER_H

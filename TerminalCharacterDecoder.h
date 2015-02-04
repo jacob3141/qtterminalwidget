@@ -19,8 +19,7 @@
     02110-1301  USA.
 */
 
-#ifndef TERMINAL_CHARACTER_DECODER_H
-#define TERMINAL_CHARACTER_DECODER_H
+#pragma once
 
 #include "Character.h"
 
@@ -141,5 +140,3 @@ private:
     CharacterColor _lastBackColor;
 
 };
-
-#endif

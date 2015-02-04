@@ -1,5 +1,5 @@
-#ifndef _COLOR_TABLE_H
-#define _COLOR_TABLE_H
+
+#pragma once
 
 #include "CharacterColor.h"
 
@@ -49,7 +49,3 @@ static const ColorEntry blackonlightyellow_color_table[TABLE_COLORS] = {
 
 
 #endif
-
-
-#endif
-

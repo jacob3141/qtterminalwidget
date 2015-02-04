@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef VT102EMULATION_H
-#define VT102EMULATION_H
+#pragma once
 
 // Standard Library
 #include <stdio.h>
@@ -182,5 +181,3 @@ private:
   QHash<int,QString> _pendingTitleUpdates;
   QTimer* _titleUpdateTimer;
 };
-
-#endif // VT102EMULATION_H

@@ -19,13 +19,10 @@
     02110-1301  USA.
 */
 
-#ifndef SHELLCOMMAND_H
-#define SHELLCOMMAND_H
+#pragma once
 
 // Qt
 #include <QStringList>
-
-
 
 /**
  * A class to parse and extract information about shell commands.
@@ -85,6 +82,4 @@ public:
 private:
     QStringList _arguments;
 };
-
-#endif // SHELLCOMMAND_H
 

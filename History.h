@@ -18,8 +18,7 @@
     02110-1301  USA.
 */
 
-#ifndef TEHISTORY_H
-#define TEHISTORY_H
+#pragma once
 
 // Qt
 #include <QBitRef>
@@ -484,5 +483,3 @@ protected:
 
 
 #endif
-
-#endif // TEHISTORY_H

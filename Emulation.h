@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef EMULATION_H
-#define EMULATION_H
+#pragma once
 
 // System
 #include <stdio.h>
@@ -463,4 +462,3 @@ private:
   
 };
 
-#endif // ifndef EMULATION_H

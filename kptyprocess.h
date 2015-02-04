@@ -27,8 +27,8 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef KPTYPROCESS_H
-#define KPTYPROCESS_H
+#pragma once
+
 
 #include "kprocess.h"
 #include "kptydevice.h"
@@ -174,5 +174,3 @@ struct KPtyProcessPrivate : KProcessPrivate {
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KPtyProcess::PtyChannels)
-
-#endif

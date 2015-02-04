@@ -20,8 +20,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef kpty_h
-#define kpty_h
+#pragma once
 
 #include <QObject>
 
@@ -186,6 +185,3 @@ protected:
      */
     KPtyPrivate * const d_ptr;
 };
-
-#endif
-

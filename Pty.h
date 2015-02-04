@@ -28,8 +28,7 @@
     02110-1301  USA.
 */
 
-#ifndef PTY_H
-#define PTY_H
+#pragma once
 
 // Qt
 #include <QStringList>
@@ -203,5 +202,3 @@ Q_OBJECT
     bool _xonXoff;
     bool _utf8;
 };
-
-#endif // PTY_H

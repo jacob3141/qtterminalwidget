@@ -20,8 +20,7 @@
     02110-1301  USA.
 */
 
-#ifndef CHARACTER_H
-#define CHARACTER_H
+#pragma once
 
 // Qt
 #include <QHash>
@@ -215,6 +214,3 @@ private:
 };
 
 Q_DECLARE_TYPEINFO(Character, Q_MOVABLE_TYPE);
-
-#endif // CHARACTER_H
-

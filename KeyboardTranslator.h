@@ -19,8 +19,7 @@
     02110-1301  USA.
 */
 
-#ifndef KEYBOARDTRANSLATOR_H
-#define KEYBOARDTRANSLATOR_H
+#pragma once
 
 // Qt
 #include <QHash>
@@ -578,6 +577,3 @@ inline KeyboardTranslator::States KeyboardTranslator::Entry::stateMask() const {
 
 Q_DECLARE_METATYPE(KeyboardTranslator::Entry)
 Q_DECLARE_METATYPE(const KeyboardTranslator*)
-
-#endif // KEYBOARDTRANSLATOR_H
-

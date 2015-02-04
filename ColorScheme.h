@@ -19,8 +19,7 @@
     02110-1301  USA.
 */
 
-#ifndef COLORSCHEME_H
-#define COLORSCHEME_H
+#pragma once
 
 // Qt
 #include <QHash>
@@ -325,5 +324,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(const ColorScheme*)
-
-#endif //COLORSCHEME_H

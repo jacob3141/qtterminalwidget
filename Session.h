@@ -22,9 +22,7 @@
     02110-1301  USA.
 */
 
-#ifndef SESSION_H
-#define SESSION_H
-
+#pragma once
 
 #include <QStringList>
 #include <QWidget>
@@ -32,13 +30,9 @@
 #include "History.h"
 
 class KProcess;
-
-
-
 class Emulation;
 class Pty;
 class TerminalDisplay;
-//class ZModemDialog;
 
 /**
  * Represents a terminal session consisting of a pseudo-teletype and a terminal emulation.
@@ -616,5 +610,3 @@ private:
 
     int _masterMode;
 };
-
-#endif

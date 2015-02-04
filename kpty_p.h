@@ -20,8 +20,7 @@
     Boston, MA 02110-1301, USA.
 */
 
-#ifndef kpty_p_h
-#define kpty_p_h
+#pragma once
 
 #include "kpty.h"
 
@@ -46,5 +45,3 @@ struct KPtyPrivate {
 
     KPty *q_ptr;
 };
-
-#endif
