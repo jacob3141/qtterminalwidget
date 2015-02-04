@@ -32,7 +32,6 @@ class QUrl;
 class TerminalWidget : public QWidget {
     Q_OBJECT
 public:
-
     enum ScrollBarPosition {
         /** Do not show the scroll bar. */
         NoScrollBar=0,
@@ -55,7 +54,7 @@ public:
 
     void startShellProgram();
 
-    int getShellPID();
+    int shellPid();
 
     void changeDir(const QString& dir);
 
@@ -133,8 +132,8 @@ public:
 
     void setSelectionStart(int row, int column);
     void setSelectionEnd(int row, int column);
-    void getSelectionStart(int& row, int& column);
-    void getSelectionEnd(int& row, int& column);
+    void selectionStart(int& row, int& column);
+    void selectionEnd(int& row, int& column);
 
     /**
      * Returns the currently selected text.
@@ -154,13 +153,13 @@ public:
      * @param[in] pos The point of interest in the QTermWidget coordinates.
      * @return Hotspot for the given position, or nullptr if no hotspot.
      */
-    Filter::HotSpot* getHotSpotAt(const QPoint& pos) const;
+    Filter::HotSpot* hotSpotAt(const QPoint& pos) const;
 
     /** Returns the available hotspots for the given row and column.
      *
      * @return Hotspot for the given position, or nullptr if no hotspot.
      */
-    Filter::HotSpot* getHotSpotAt(int row, int column) const;
+    Filter::HotSpot* hotSpotAt(int row, int column) const;
 
 signals:
     void finished();

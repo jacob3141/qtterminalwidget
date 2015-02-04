@@ -94,7 +94,7 @@ void TerminalWidget::noMatchFound() {
     _terminalDisplay->screenWindow()->clearSelection();
 }
 
-int TerminalWidget::getShellPID() {
+int TerminalWidget::shellPid() {
     return _session->processId();
 }
 
@@ -105,7 +105,7 @@ void TerminalWidget::changeDir(const QString & dir) {
        be portable to anything other than Linux.
     */
     QString strCmd;
-    strCmd.setNum(getShellPID());
+    strCmd.setNum(shellPid());
     strCmd.prepend("ps -j ");
     strCmd.append(" | tail -1 | awk '{ print $5 }' | grep -q \\+");
     int retval = system(strCmd.toStdString().c_str());
@@ -269,7 +269,7 @@ QString TerminalWidget::workingDirectory() {
     // Christian Surlykke: On linux we could look at /proc/<pid>/cwd which should be a link to current
     // working directory (<pid>: process id of the shell). I don't know about BSD.
     // Maybe we could just offer it when running linux, for a start.
-    QDir d(QString("/proc/%1/cwd").arg(getShellPID()));
+    QDir d(QString("/proc/%1/cwd").arg(shellPid()));
     if (!d.exists())
     {
         qDebug() << "Cannot find" << d.dirName();
@@ -466,11 +466,11 @@ void TerminalWidget::setSelectionEnd(int row, int column) {
     _terminalDisplay->screenWindow()->screen()->setSelectionEnd(column, row);
 }
 
-void TerminalWidget::getSelectionStart(int& row, int& column) {
+void TerminalWidget::selectionStart(int& row, int& column) {
     _terminalDisplay->screenWindow()->screen()->getSelectionStart(column, row);
 }
 
-void TerminalWidget::getSelectionEnd(int& row, int& column) {
+void TerminalWidget::selectionEnd(int& row, int& column) {
     _terminalDisplay->screenWindow()->screen()->getSelectionEnd(column, row);
 }
 
@@ -490,13 +490,13 @@ void TerminalWidget::setSilenceTimeout(int seconds) {
     _session->setMonitorSilenceSeconds(seconds);
 }
 
-Filter::HotSpot* TerminalWidget::getHotSpotAt(const QPoint &pos) const {
+Filter::HotSpot* TerminalWidget::hotSpotAt(const QPoint &pos) const {
     int row = 0, column = 0;
     _terminalDisplay->getCharacterPosition(pos, row, column);
-    return getHotSpotAt(row, column);
+    return hotSpotAt(row, column);
 }
 
-Filter::HotSpot* TerminalWidget::getHotSpotAt(int row, int column) const {
+Filter::HotSpot* TerminalWidget::hotSpotAt(int row, int column) const {
     return _terminalDisplay->filterChain()->hotSpotAt(row, column);
 }
 
