@@ -24,7 +24,7 @@
 */
 
 // Own includes
-#include "colortables.h"
+#include "charactercolor.h"
 #include "terminalsession.h"
 #include "screen.h"
 #include "screenwindow.h"
@@ -199,7 +199,7 @@ void TerminalWidget::initialize(bool startSession) {
 
     connect(_terminalSession, SIGNAL(finished()), this, SLOT(sessionFinished()));
 
-    setColorScheme("WhiteOnBlack");
+    setColorScheme("Linux");
 }
 
 void TerminalWidget::createSession() {
@@ -311,6 +311,8 @@ void TerminalWidget::setColorScheme(QString origName) {
                 QFileInfo(origName).baseName() :
                 origName;
 
+    QStringList colorSchemes = availableColorSchemes();
+    qDebug() << colorSchemes;
     if(!availableColorSchemes().contains(name)) {
         if (isFile) {
             if (ColorSchemeManager::instance()->loadCustomColorScheme(origName))
@@ -341,8 +343,9 @@ void TerminalWidget::setColorScheme(QString origName) {
 
 QStringList TerminalWidget::availableColorSchemes() {
     QStringList ret;
-    foreach (const ColorScheme* cs, ColorSchemeManager::instance()->allColorSchemes())
+    foreach (const ColorScheme* cs, ColorSchemeManager::instance()->allColorSchemes()) {
         ret.append(cs->name());
+    }
     return ret;
 }
 

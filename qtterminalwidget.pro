@@ -11,7 +11,6 @@ HEADERS += \
     character.h \
     charactercolor.h \
     colorscheme.h \
-    colortables.h \
     defaulttranslatortext.h \
     extendeddefaulttranslator.h \
     filter.h \
@@ -51,8 +50,9 @@ SOURCES += \
     pseudoterminaldevice.cpp \
     pseudoterminalprocess.cpp \
     terminalemulation.cpp
-RESOURCES += color-schemes/color-schemes.qrc \
+RESOURCES += \
              designer/qtermwidgetplugin.qrc \
-             kb-layouts/kb-layouts.qrc
+    color-schemes/colorschemes.qrc \
+    kb-layouts/kblayouts.qrc
 
 DEFINES +=

@@ -565,6 +565,7 @@ bool ColorSchemeManager::loadKDE3ColorScheme(QString filePath)
 }
 
 bool ColorSchemeManager::loadCustomColorScheme(QString path) {
+    qDebug() << "Loading custom color scheme: " << path;
     if (path.endsWith(QLatin1String(".colorscheme")))
         return loadColorScheme(path);
     else if (path.endsWith(QLatin1String(".schema")))
@@ -691,9 +692,10 @@ const ColorScheme* ColorSchemeManager::findColorScheme(QString name)  {
 }
 
 ColorSchemeManager* ColorSchemeManager::theColorSchemeManager = 0;
-ColorSchemeManager* ColorSchemeManager::instance()
-{
-    if (! theColorSchemeManager)
+ColorSchemeManager* ColorSchemeManager::instance() {
+    if (! theColorSchemeManager) {
+        Q_INIT_RESOURCE(colorschemes);
         theColorSchemeManager = new ColorSchemeManager();
+    }
     return theColorSchemeManager;
 }

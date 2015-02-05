@@ -60,17 +60,19 @@ QString KeyboardTranslatorManager::findTranslatorPath(QString name)
     return QString(":/" + name + ".keytab");
 }
 
-void KeyboardTranslatorManager::findTranslators()
-{
+void KeyboardTranslatorManager::findTranslators() {
+    static bool resourceInitialized = false;
+    if(!resourceInitialized) {
+        Q_INIT_RESOURCE(kblayouts);
+        resourceInitialized = true;
+    }
+
     QDir dir(":/");
     QStringList filters;
     filters << "*.keytab";
     dir.setNameFilters(filters);
     QStringList list = dir.entryList(filters);
     list = dir.entryList(filters);
-    //    QStringList list = KGlobal::dirs()->findAllResources("data",
-    //                                                         "konsole/*.keytab",
-    //                                                        KStandardDirs::NoDuplicates);
 
     // add the name of each translator to the list and associated
     // the name with a null pointer to indicate that the translator
