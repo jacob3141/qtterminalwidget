@@ -356,6 +356,12 @@ public:
      */
     void setVTFont(const QFont& font);
 
+    /** Determine the width of this text. */
+    int textWidth(int startColumn, int length, int line) const;
+
+    /** Determine the area that encloses this series of characters. */
+    QRect calculateTextArea(int topLeftX, int topLeftY, int startColumn, int line, int length);
+
     /**
      * Specified whether anti-aliasing of text in the terminal display
      * is enabled or not.  Defaults to enabled.

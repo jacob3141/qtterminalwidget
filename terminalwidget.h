@@ -73,6 +73,7 @@ public:
      * Sets the terminal font. Please be aware that you are only allowed
      * to set monospaced fonts. Non-monospaced fonts will lead to graphical
      * glitches.
+     * Beware of a performance penalty and display/alignment issues when using a proportional font.
      */
     void setTerminalFont(const QFont& font);
 

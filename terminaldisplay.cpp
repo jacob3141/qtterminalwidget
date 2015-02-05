@@ -273,7 +273,7 @@ void TerminalDisplay::setVTFont(const QFont& f)
 
     if ( !QFontInfo(font).fixedPitch() )
     {
-        qDebug() << "Using an unsupported variable-width font in the terminal.  This may produce display errors.";
+        qDebug() << "Using a variable-width font in the terminal.  This may cause performance degradation and display/alignment errors.";
     }
 
     if ( metrics.height() < height() && metrics.maxWidth() < width() )
@@ -291,6 +291,25 @@ void TerminalDisplay::setVTFont(const QFont& f)
         QWidget::setFont(font);
         fontChange(font);
     }
+}
+
+int TerminalDisplay::textWidth(int startColumn, int length, int line) const {
+    QFontMetrics fm(font());
+    int result = 0;
+    for (int column = 0; column < length; column++) {
+        result += fm.width(_image[loc(startColumn + column, line)].character);
+    }
+    return result;
+}
+
+QRect TerminalDisplay::calculateTextArea(int topLeftX, int topLeftY, int startColumn, int line, int length) {
+    int left = _fixedFont ? _fontWidth * startColumn : textWidth(0, startColumn, line);
+    int top = _fontHeight * line;
+    int width = _fixedFont ? _fontWidth * length : textWidth(startColumn, length, line);
+    return QRect(_leftMargin + topLeftX + left,
+                 _topMargin + topLeftY + top,
+                 width,
+                 _fontHeight);
 }
 
 void TerminalDisplay::setFont(const QFont &)
@@ -1416,9 +1435,9 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
     int    tLy = tL.y();
 
     int lux = qMin(_usedColumns-1, qMax(0,(rect.left()   - tLx - _leftMargin ) / _fontWidth));
-    int luy = qMin(_usedLines-1,  qMax(0,(rect.top()    - tLy - _topMargin  ) / _fontHeight));
+    int luy = qMin(_usedLines-1,   qMax(0,(rect.top()    - tLy - _topMargin  ) / _fontHeight));
     int rlx = qMin(_usedColumns-1, qMax(0,(rect.right()  - tLx - _leftMargin ) / _fontWidth));
-    int rly = qMin(_usedLines-1,  qMax(0,(rect.bottom() - tLy - _topMargin  ) / _fontHeight));
+    int rly = qMin(_usedLines-1,   qMax(0,(rect.bottom() - tLy - _topMargin  ) / _fontHeight));
 
     const int bufferSize = _usedColumns;
     QString unistr;
@@ -1507,7 +1526,7 @@ void TerminalDisplay::drawContents(QPainter &paint, const QRect &rect)
             paint.setWorldMatrix(textScale, true);
 
             //calculate the area in which the text will be drawn
-            QRect textArea = QRect( _leftMargin+tLx+_fontWidth*x , _topMargin+tLy+_fontHeight*y , _fontWidth*len , _fontHeight);
+            QRect textArea = calculateTextArea(tLx, tLy, x, y, len);
 
             //move the calculated area to take account of scaling applied to the painter.
             //the position of the area from the origin (0,0) is scaled
@@ -2193,10 +2212,18 @@ void TerminalDisplay::mouseReleaseEvent(QMouseEvent* ev)
     }
 }
 
-void TerminalDisplay::getCharacterPosition(const QPoint& widgetPoint,int& line,int& column) const
-{
-    column = (widgetPoint.x() + _fontWidth/2 -contentsRect().left()-_leftMargin) / _fontWidth;
+void TerminalDisplay::getCharacterPosition(const QPoint& widgetPoint,int& line,int& column) const {
     line = (widgetPoint.y()-contentsRect().top()-_topMargin) / _fontHeight;
+
+    if(_fixedFont) {
+        column = (widgetPoint.x() + _fontWidth / 2 -contentsRect().left()-_leftMargin) / _fontWidth;
+    } else {
+        int x = contentsRect().left() + widgetPoint.x() - _fontWidth / 2;
+        column = 0;
+
+        while(x > textWidth(0, column, line))
+            column++;
+    }
 
     if ( line < 0 )
         line = 0;
