@@ -18,7 +18,6 @@ HEADERS += \
     history.h \
     historysearch.h \
     keyboardtranslator.h \
-    linefont.h \
     screen.h \
     searchbar.h \
     shellcommand.h \
@@ -27,7 +26,6 @@ HEADERS += \
     vt102emulation.h \
     screenwindow.h \
     terminalsession.h \
-    process.h \
     ringbuffer.h \
     pseudoterminaldevice.h \
     pseudoterminalprocess.h \
@@ -50,7 +48,6 @@ SOURCES += \
     terminaldisplay.cpp \
     vt102emulation.cpp \
     terminalsession.cpp \
-    process.cpp \
     pseudoterminaldevice.cpp \
     pseudoterminalprocess.cpp \
     terminalemulation.cpp

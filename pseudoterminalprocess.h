@@ -37,9 +37,7 @@
 #pragma once
 
 // Own includes
-#include "process.h"
 class PseudoTerminalDevice;
-struct PseudoTerminalProcessPrivate;
 
 // System includes
 #include <signal.h>
@@ -49,23 +47,13 @@ struct PseudoTerminalProcessPrivate;
 #include <QVector>
 #include <QList>
 #include <QSize>
+#include <QProcess>
 
 /**
- * This class extends KProcess by support for PTYs (pseudo TTYs).
- *
- * The PTY is opened as soon as the class is instantiated. Verify that
- * it was opened successfully by checking that pty()->masterFd() is not -1.
- *
- * The PTY is always made the process' controlling TTY.
- * Utmp registration and connecting the stdio handles to the PTY are optional.
- *
- * No attempt to integrate with QProcess' waitFor*() functions was made,
- * for it is impossible. Note that execute() does not work with the PTY, too.
- * Use the PTY device's waitFor*() functions or use it asynchronously.
- *
+ * TODO: doc
  * @author Oswald Buddenhagen <ossi@kde.org>
  */
-class PseudoTerminalProcess : public Process {
+class PseudoTerminalProcess : public QProcess {
     Q_OBJECT
 
 public:
@@ -181,6 +169,80 @@ public:
     PseudoTerminalChannels pseudoTerminalChannels() const;
 
     /**
+     * Adds the variable @p name to the process' environment.
+     *
+     * This function must be called before starting the process.
+     *
+     * @param name the name of the environment variable
+     * @param value the new value for the environment variable
+     * @param overwrite if @c false and the environment variable is already
+     *   set, the old value will be preserved
+     */
+    void appendEnvironmentVariable(QString name, QString value, bool overwrite = true);
+
+    /**
+     * Removes the variable @p name from the process' environment.
+     *
+     * This function must be called before starting the process.
+     *
+     * @param name the name of the environment variable
+     */
+    void removeEnvironmentVariable(QString name);
+
+    /**
+     * Empties the process' environment.
+     *
+     * Note that LD_LIBRARY_PATH/DYLD_LIBRARY_PATH is automatically added
+     * on *NIX.
+     *
+     * This function must be called before starting the process.
+     */
+    void clearEnvironment();
+
+    /**
+     * Set the QIODevice open mode the process will be opened in.
+     *
+     * This function must be called before starting the process, obviously.
+     *
+     * @param mode the open mode. Note that this mode is automatically
+     *   "reduced" according to the channel modes and redirections.
+     *   The default is QIODevice::ReadWrite.
+     */
+    void setNextOpenMode(QIODevice::OpenMode mode);
+
+    /**
+     * Set the program and the command line arguments.
+     *
+     * This function must be called before starting the process, obviously.
+     *
+     * @param exe the program to execute
+     * @param args the command line arguments for the program,
+     *   one per list element
+     */
+    void setProgram(QString program, QStringList arguments = QStringList());
+
+    /**
+     * @overload
+     *
+     * @param argv the program to execute and the command line arguments
+     *   for the program, one per list element
+     */
+    void setProgram(QStringList arguments);
+
+    /**
+     * Clear the program and command line argument list.
+     */
+    void clearProgram();
+
+    /**
+     * Obtain the currently set program and arguments.
+     *
+     * @return a list, the first element being the program, the remaining ones
+     *  being command line arguments to the program.
+     */
+    QStringList program() const;
+
+    /**
      * Set whether to register the process as a TTY login in utmp.
      *
      * Utmp is disabled by default.
@@ -199,6 +261,102 @@ public:
      * @return whether to register in utmp
      */
     bool isUseUtmp() const;
+
+    /**
+     * Obtain the process' ID as known to the system.
+     *
+     * Unlike with QProcess::pid(), this is a real PID also on Windows.
+     *
+     * This function can be called only while the process is running.
+     * It cannot be applied to detached processes.
+     *
+     * @return the process ID
+     */
+    int pid() const;
+
+    /**
+     * Start the process.
+     *
+     * @see QProcess::start(QString, QStringList , OpenMode)
+     */
+    void start();
+
+    /**
+     * Start the process, wait for it to finish, and return the exit code.
+     *
+     * This method is roughly equivalent to the sequence:
+     * <code>
+     *   start();
+     *   waitForFinished(msecs);
+     *   return exitCode();
+     * </code>
+     *
+     * Unlike the other execute() variants this method is not static,
+     * so the process can be parametrized properly and talked to.
+     *
+     * @param msecs time to wait for process to exit before killing it
+     * @return -2 if the process could not be started, -1 if it crashed,
+     *  otherwise its exit code
+     */
+    int execute(int msecs = -1);
+
+    /**
+     * @overload
+     *
+     * @param exe the program to execute
+     * @param args the command line arguments for the program,
+     *   one per list element
+     * @param msecs time to wait for process to exit before killing it
+     * @return -2 if the process could not be started, -1 if it crashed,
+     *  otherwise its exit code
+     */
+    static int execute(QString exe, QStringList args = QStringList(), int msecs = -1);
+
+    /**
+     * @overload
+     *
+     * @param argv the program to execute and the command line arguments
+     *   for the program, one per list element
+     * @param msecs time to wait for process to exit before killing it
+     * @return -2 if the process could not be started, -1 if it crashed,
+     *  otherwise its exit code
+     */
+    static int execute(QStringList argv, int msecs = -1);
+
+    /**
+     * Start the process and detach from it. See QProcess::startDetached()
+     * for details.
+     *
+     * Unlike the other startDetached() variants this method is not static,
+     * so the process can be parametrized properly.
+     * @note Currently, only the setProgram()/setShellCommand() and
+     * setWorkingDirectory() parametrizations are supported.
+     *
+     * The KProcess object may be re-used immediately after calling this
+     * function.
+     *
+     * @return the PID of the started process or 0 on error
+     */
+    int startDetached();
+
+    /**
+     * @overload
+     *
+     * @param exe the program to start
+     * @param args the command line arguments for the program,
+     *   one per list element
+     * @return the PID of the started process or 0 on error
+     */
+    static int startDetached(QString exe, QStringList args = QStringList());
+
+    /**
+     * @overload
+     *
+     * @param argv the program to start and the command line arguments
+     *   for the program, one per list element
+     * @return the PID of the started process or 0 on error
+     */
+    static int startDetached(QStringList argv);
 
 public slots:
     /**
@@ -250,6 +408,9 @@ private:
     PseudoTerminalProcess::PseudoTerminalChannels _pseudoTerminalChannels;
     bool _addUtmp;
 
+    QString _program;
+    QStringList _arguments;
+    QIODevice::OpenMode _openMode;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(PseudoTerminalProcess::PseudoTerminalChannels)

@@ -36,7 +36,6 @@
 
 // Own includes
 #include "pseudoterminalprocess.h"
-#include "process.h"
 #include "pseudoterminaldevice.h"
 
 // System includes
@@ -51,10 +50,13 @@
 
 // Qt includes
 #include <QStringList>
-#include <QtDebug>
+#include <QFile>
+#include <QDebug>
+
+#define DUMMYENV "_KPROCESS_DUMMY_="
 
 PseudoTerminalProcess::PseudoTerminalProcess(QObject *parent) :
-    Process(parent) {
+    QProcess(parent) {
     _pseudoTerminalDevice = new PseudoTerminalDevice(this);
     _pseudoTerminalDevice->open();
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
@@ -63,7 +65,7 @@ PseudoTerminalProcess::PseudoTerminalProcess(QObject *parent) :
 }
 
 PseudoTerminalProcess::PseudoTerminalProcess(int ptyMasterFd, QObject *parent) :
-    Process(parent) {
+    QProcess(parent) {
     _pseudoTerminalDevice = new PseudoTerminalDevice(this);
     _pseudoTerminalDevice->open(ptyMasterFd);
     connect(this, SIGNAL(stateChanged(QProcess::ProcessState)),
@@ -197,12 +199,12 @@ int PseudoTerminalProcess::start(QString program,
                ulong winid,
                bool addToUtmp) {
     qDebug() << "Starting pseudoterminal process";
-    clearProgram();
 
     // For historical reasons, the first argument in programArguments is the
     // name of the program to execute, so create a list consisting of all
     // but the first argument to pass to setProgram()
     Q_ASSERT(programArguments.count() >= 1);
+    clearProgram();
     setProgram(program.toLatin1(), programArguments.mid(1));
 
     appendEnvironmentVariables(environment);
@@ -249,7 +251,7 @@ int PseudoTerminalProcess::start(QString program,
 
     pseudoTerminalDevice()->setWinSize(_windowLines, _windowColumns);
 
-    Process::start();
+    start();
 
     if (!waitForStarted())
         return -1;
@@ -304,12 +306,147 @@ int PseudoTerminalProcess::foregroundProcessGroup() const {
     return 0;
 }
 
+void PseudoTerminalProcess::clearEnvironment() {
+    setEnvironment(QStringList() << QString::fromLatin1(DUMMYENV));
+}
+
+void PseudoTerminalProcess::setNextOpenMode(QIODevice::OpenMode mode) {
+    _openMode = mode;
+}
+
+void PseudoTerminalProcess::setProgram(QString program, QStringList arguments) {
+    _program = program;
+    _arguments = arguments;
+#ifdef Q_OS_WIN
+    setNativeArguments(QString());
+#endif
+}
+
+void PseudoTerminalProcess::setProgram(QStringList arguments) {
+    Q_ASSERT(!arguments.isEmpty());
+    _arguments = arguments;
+    _program = _arguments.takeFirst();
+#ifdef Q_OS_WIN
+    setNativeArguments(QString());
+#endif
+}
+
+void PseudoTerminalProcess::clearProgram() {
+    _program.clear();
+    _arguments.clear();
+#ifdef Q_OS_WIN
+    setNativeArguments(QString());
+#endif
+}
+
+QStringList PseudoTerminalProcess::program() const {
+    QStringList argv = _arguments;
+    argv.prepend(_program);
+    return argv;
+}
+
+void PseudoTerminalProcess::appendEnvironmentVariable(QString name, QString value, bool overwrite) {
+    qDebug() << "Appending environment variable " << name << "=" << value;
+    QStringList env = environment();
+    if (env.isEmpty()) {
+        env = systemEnvironment();
+        env.removeAll(QString::fromLatin1(DUMMYENV));
+    }
+    QString fname(name);
+    fname.append(QLatin1Char('='));
+    for (QStringList::Iterator it = env.begin(); it != env.end(); ++it)
+        if ((*it).startsWith(fname)) {
+            if (overwrite) {
+                *it = fname.append(value);
+                setEnvironment(env);
+            }
+            return;
+        }
+    env.append(fname.append(value));
+    setEnvironment(env);
+}
+
+void PseudoTerminalProcess::removeEnvironmentVariable(QString name) {
+    QStringList env = environment();
+    if (env.isEmpty()) {
+        env = systemEnvironment();
+        env.removeAll(QString::fromLatin1(DUMMYENV));
+    }
+    QString fname(name);
+    fname.append(QLatin1Char('='));
+    for (QStringList::Iterator it = env.begin(); it != env.end(); ++it)
+        if ((*it).startsWith(fname)) {
+            env.erase(it);
+            if (env.isEmpty())
+                env.append(QString::fromLatin1(DUMMYENV));
+            setEnvironment(env);
+            return;
+        }
+}
+
 void PseudoTerminalProcess::setUseUtmp(bool value) {
     _addUtmp = value;
 }
 
 bool PseudoTerminalProcess::isUseUtmp() const {
     return _addUtmp;
+}
+
+int PseudoTerminalProcess::pid() const {
+#ifdef Q_OS_UNIX
+    return (int) QProcess::pid();
+#else
+    return QProcess::pid() ? QProcess::pid()->dwProcessId : 0;
+#endif
+}
+
+void PseudoTerminalProcess::start() {
+    qDebug() << _program << " - " << _arguments << " - " << _openMode;
+    QProcess::start(_program, _arguments, _openMode);
+}
+
+int PseudoTerminalProcess::execute(int msecs) {
+    start();
+    if (!waitForFinished(msecs)) {
+        kill();
+        waitForFinished(-1);
+        return -2;
+    }
+    return (exitStatus() == QProcess::NormalExit) ? exitCode() : -1;
+}
+
+int PseudoTerminalProcess::execute(QString exe, QStringList args, int msecs) {
+    PseudoTerminalProcess p;
+    p.setProgram(exe, args);
+    return p.execute(msecs);
+}
+
+int PseudoTerminalProcess::execute(QStringList argv, int msecs) {
+    PseudoTerminalProcess p;
+    p.setProgram(argv);
+    return p.execute(msecs);
+}
+
+int PseudoTerminalProcess::startDetached() {
+    qint64 pid;
+    if (!QProcess::startDetached(_program, _arguments, workingDirectory(), &pid)) {
+        return 0;
+    }
+    return (int)pid;
+}
+
+int PseudoTerminalProcess::startDetached(QString exe, QStringList args) {
+    qint64 pid;
+    if (!QProcess::startDetached(exe, args, QString(), &pid)) {
+        return 0;
+    }
+    return (int)pid;
+}
+
+int PseudoTerminalProcess::startDetached(QStringList argv) {
+    QStringList args = argv;
+    QString prog = args.takeFirst();
+    return startDetached(prog, args);
 }
 
 PseudoTerminalDevice *PseudoTerminalProcess::pseudoTerminalDevice() const {
@@ -328,7 +465,7 @@ void PseudoTerminalProcess::setupChildProcess() {
     if (_pseudoTerminalChannels & StderrChannel)
         dup2(_pseudoTerminalDevice->slaveFd(), 2);
 
-    Process::setupChildProcess();
+    QProcess::setupChildProcess();
 
     // reset all signal handlers
     // this ensures that terminal applications respond to
