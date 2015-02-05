@@ -138,54 +138,25 @@ void TerminalWidget::startShellProgram() {
 }
 
 void TerminalWidget::initialize(bool startSession) {
-    _layout = new QVBoxLayout();
-    _layout->setMargin(0);
-    setLayout(_layout);
-    
     createSession();
     createTerminalDisplay();
-    _terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    _layout->addWidget(_terminalDisplay);
+    // Link session with terminal display
+    _terminalSession->addView(_terminalDisplay);
 
-    connect(_terminalSession, SIGNAL(bellRequest(QString)), _terminalDisplay, SLOT(bell(QString)));
     connect(_terminalDisplay, SIGNAL(notifyBell(QString)), this, SIGNAL(bell(QString)));
-
+    connect(_terminalSession, SIGNAL(bellRequest(QString)), _terminalDisplay, SLOT(bell(QString)));
     connect(_terminalSession, SIGNAL(activity()), this, SIGNAL(activity()));
     connect(_terminalSession, SIGNAL(silence()), this, SIGNAL(silence()));
-
-    // That's OK, FilterChain's dtor takes care of UrlFilter.
-    UrlFilter *urlFilter = new UrlFilter();
-    connect(urlFilter, SIGNAL(activated(QUrl)), this, SIGNAL(urlActivated(QUrl)));
-    _terminalDisplay->filterChain()->addFilter(urlFilter);
 
     _searchBar = new SearchBar(this);
     _searchBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
     connect(_searchBar, SIGNAL(searchCriteriaChanged()), this, SLOT(find()));
     connect(_searchBar, SIGNAL(findNext()), this, SLOT(findNext()));
     connect(_searchBar, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
-    _layout->addWidget(_searchBar);
     _searchBar->hide();
 
-    if (startSession && _terminalSession) {
-        _terminalSession->start();
-    }
-
-    this->setFocus( Qt::OtherFocusReason );
-    this->setFocusPolicy( Qt::WheelFocus );
-    _terminalDisplay->resize(this->size());
-
-    this->setFocusProxy(_terminalDisplay);
-    connect(_terminalDisplay, SIGNAL(copyAvailable(bool)),
-            this, SLOT(selectionChanged(bool)));
-    connect(_terminalDisplay, SIGNAL(termGetFocus()),
-            this, SIGNAL(termGetFocus()));
-    connect(_terminalDisplay, SIGNAL(termLostFocus()),
-            this, SIGNAL(termLostFocus()));
-    connect(_terminalDisplay, SIGNAL(keyPressedSignal(QKeyEvent *)),
-            this, SIGNAL(termKeyPressed(QKeyEvent *)));
-    //    _terminalDisplay->setSize(80, 40);
-
+    // Set fonts
     QFont font = QApplication::font();
     font.setFamily("Monospace");
     font.setPointSize(10);
@@ -193,13 +164,18 @@ void TerminalWidget::initialize(bool startSession) {
     setTerminalFont(font);
     _searchBar->setFont(font);
 
-    setScrollBarPosition(NoScrollBar);
+    //setScrollBarPosition(NoScrollBar);
 
-    _terminalSession->addView(_terminalDisplay);
+    // Set layout
+    _layout = new QVBoxLayout();
+    _layout->setMargin(0);
+    _layout->addWidget(_terminalDisplay);
+    _layout->addWidget(_searchBar);
+    setLayout(_layout);
 
-    connect(_terminalSession, SIGNAL(finished()), this, SLOT(sessionFinished()));
-
-    setColorScheme("Linux");
+    if(startSession && _terminalSession) {
+        _terminalSession->start();
+    }
 }
 
 void TerminalWidget::createSession() {
@@ -223,6 +199,8 @@ void TerminalWidget::createSession() {
     _terminalSession->setFlowControlEnabled(true);
     _terminalSession->setHistoryType(HistoryTypeBuffer(1000));
     _terminalSession->setKeyBindings("");
+
+    connect(_terminalSession, SIGNAL(finished()), this, SLOT(sessionFinished()));
 }
 
 void TerminalWidget::createTerminalDisplay() {
@@ -232,6 +210,28 @@ void TerminalWidget::createTerminalDisplay() {
     _terminalDisplay->setTripleClickMode(TerminalDisplay::SelectWholeLine);
     _terminalDisplay->setTerminalSizeStartup(true);
     _terminalDisplay->setRandomSeed(_terminalSession->sessionId() * 31);
+    _terminalDisplay->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    connect(_terminalDisplay, SIGNAL(copyAvailable(bool)),
+            this, SLOT(selectionChanged(bool)));
+    connect(_terminalDisplay, SIGNAL(termGetFocus()),
+            this, SIGNAL(termGetFocus()));
+    connect(_terminalDisplay, SIGNAL(termLostFocus()),
+            this, SIGNAL(termLostFocus()));
+    connect(_terminalDisplay, SIGNAL(keyPressedSignal(QKeyEvent *)),
+            this, SIGNAL(termKeyPressed(QKeyEvent *)));
+
+    setFocus(Qt::OtherFocusReason);
+    setFocusPolicy(Qt::WheelFocus);
+    setFocusProxy(_terminalDisplay);
+
+    setColorScheme("Linux");
+
+    // That's OK, FilterChain's dtor takes care of UrlFilter.
+    UrlFilter *urlFilter = new UrlFilter();
+    connect(urlFilter, SIGNAL(activated(QUrl)), this, SIGNAL(urlActivated(QUrl)));
+    _terminalDisplay->filterChain()->addFilter(urlFilter);
+
 }
 
 TerminalWidget::~TerminalWidget() {
@@ -380,6 +380,10 @@ void TerminalWidget::pasteText(QString text) {
 
 void TerminalWidget::resizeEvent(QResizeEvent*) {
     _terminalDisplay->resize(this->size());
+}
+
+void TerminalWidget::closeEvent(QCloseEvent *) {
+    _terminalSession->close();
 }
 
 void TerminalWidget::sessionFinished() {

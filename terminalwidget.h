@@ -225,6 +225,7 @@ public slots:
 
 protected:
     virtual void resizeEvent(QResizeEvent *);
+    virtual void closeEvent(QCloseEvent *);
 
 protected slots:
     void sessionFinished();
